@@ -27,7 +27,7 @@ This milestone (M3) moves backend logic out of the client's `FakeData`-backed se
 
 ## Off-limits
 - Do not add npm dependencies without asking.
-- Do not touch AWS resources (deploy, delete, modify) without confirming with me first — SAM deploys create real billable resources.
+- Never run AWS-touching commands yourself (`sam build`/`sam deploy`/`aws ...`/`sam local invoke`, console actions) — the user runs all of these personally, by design, for hands-on familiarity. Write the code/template changes, then give the exact command(s) or console steps to run and the result to expect. Same for anything in the AWS console (testing a Lambda, testing an API Gateway method, adding/publishing method documentation) — describe exactly what to click, let the user do it and report back.
 - Do not rewrite `FakeData.ts` — the server services still return its dummy data this milestone.
 
 ## AI attribution
