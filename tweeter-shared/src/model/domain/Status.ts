@@ -1,6 +1,13 @@
+// AI-assisted: see AI-ATTRIBUTION.md
 import { PostSegment, Type } from "./PostSegment";
-import { User } from "./User";
+import { User, UserDto } from "./User";
 import { format } from "date-fns";
+
+export interface StatusDto {
+  post: string;
+  user: UserDto;
+  timestamp: number;
+}
 
 export class Status {
   private _post: string;
@@ -228,5 +235,21 @@ export class Status {
 
   public toJson(): string {
     return JSON.stringify(this);
+  }
+
+  public toDto(): StatusDto {
+    return {
+      post: this._post,
+      user: this._user.toDto(),
+      timestamp: this._timestamp,
+    };
+  }
+
+  public static fromDto(dto: StatusDto | null | undefined): Status | null {
+    if (!!dto) {
+      return new Status(dto.post, User.fromDto(dto.user) as User, dto.timestamp);
+    } else {
+      return null;
+    }
   }
 }

@@ -1,3 +1,11 @@
+// AI-assisted: see AI-ATTRIBUTION.md
+export interface UserDto {
+  firstName: string;
+  lastName: string;
+  alias: string;
+  imageUrl: string;
+}
+
 export class User {
   private _firstName: string;
   private _lastName: string;
@@ -77,5 +85,22 @@ export class User {
 
   public toJson(): string {
     return JSON.stringify(this);
+  }
+
+  public toDto(): UserDto {
+    return {
+      firstName: this._firstName,
+      lastName: this._lastName,
+      alias: this._alias,
+      imageUrl: this._imageUrl,
+    };
+  }
+
+  public static fromDto(dto: UserDto | null | undefined): User | null {
+    if (!!dto) {
+      return new User(dto.firstName, dto.lastName, dto.alias, dto.imageUrl);
+    } else {
+      return null;
+    }
   }
 }

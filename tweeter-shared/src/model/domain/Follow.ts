@@ -1,4 +1,10 @@
-import { User } from "./User";
+// AI-assisted: see AI-ATTRIBUTION.md
+import { User, UserDto } from "./User";
+
+export interface FollowDto {
+    follower: UserDto;
+    followee: UserDto;
+}
 
 export class Follow {
     private _follower: User;
@@ -23,5 +29,23 @@ export class Follow {
 
     public set followee(value: User) {
         this._followee = value;
-    }    
+    }
+
+    public toDto(): FollowDto {
+        return {
+            follower: this._follower.toDto(),
+            followee: this._followee.toDto(),
+        };
+    }
+
+    public static fromDto(dto: FollowDto | null | undefined): Follow | null {
+        if (!!dto) {
+            return new Follow(
+                User.fromDto(dto.follower) as User,
+                User.fromDto(dto.followee) as User
+            );
+        } else {
+            return null;
+        }
+    }
 }

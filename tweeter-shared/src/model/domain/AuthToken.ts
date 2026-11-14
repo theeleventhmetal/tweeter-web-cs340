@@ -1,4 +1,11 @@
+// AI-assisted: see AI-ATTRIBUTION.md
 import { v4 as uuid } from "uuid";
+
+export interface AuthTokenDto {
+  token: string;
+  timestamp: number;
+}
+
 export class AuthToken {
   private _token: string;
   private _timestamp: number;
@@ -61,5 +68,20 @@ export class AuthToken {
 
   public toJson(): string {
     return JSON.stringify(this);
+  }
+
+  public toDto(): AuthTokenDto {
+    return {
+      token: this._token,
+      timestamp: this._timestamp,
+    };
+  }
+
+  public static fromDto(dto: AuthTokenDto | null | undefined): AuthToken | null {
+    if (!!dto) {
+      return new AuthToken(dto.token, dto.timestamp);
+    } else {
+      return null;
+    }
   }
 }
