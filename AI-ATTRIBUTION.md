@@ -15,7 +15,7 @@ One entry per task where an AI agent wrote or modified files. See `AGENTS.md` fo
 ## 2026-11-16: tweeter-server/src/service/UserService.ts (new file), tweeter-server/src/lambda/util/corsHeaders.ts (new file), tweeter-server/src/lambda/handler/LoginLambda.ts (new file), tweeter-server/template.yaml, tweeter-web/src/network/ServerFacade.ts (new file), tweeter-web/src/model.service/UserService.ts
 - Tool: Claude Code (Sonnet 5)
 - Task: Wire the Login feature end-to-end: server-side UserService.login (FakeData-backed), the LoginLambda handler (200/400 responses with CORS), the LoginFunction resource in template.yaml (POST /login on TweeterApi, esbuild build method), ServerFacade.login on the client, and tweeter-web's UserService.login updated to call it instead of FakeData. (tweeter-web/src/network/ClientCommunicator.ts was written by the user, not the agent, in a separate commit.)
-- Review: TODO (pending sam build/deploy and the browser test)
+- Review: Deployed, tested the Lambda in the console and via curl, and logged in through the running app in the browser — full pipeline confirmed working end-to-end.
 
 ## 2026-11-16: tweeter-server/scripts/bundle.mjs (new file), tweeter-server/package.json, tweeter-server/template.yaml, tweeter-server/.gitignore, AGENTS.md, tweeter-web/src/network/ServerFacade.ts, package.json
 - Tool: Claude Code (Sonnet 5)
