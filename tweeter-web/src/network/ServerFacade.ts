@@ -3,7 +3,7 @@ import { AuthRequest, AuthResponse, AuthToken, User } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
 
 export class ServerFacade {
-  private SERVER_URL = "TODO: set this to the API Gateway invoke URL after `sam deploy`.";
+  private SERVER_URL = "https://9n40e5oxh2.execute-api.us-east-1.amazonaws.com/Prod";
 
   private clientCommunicator = new ClientCommunicator(this.SERVER_URL);
 

@@ -16,3 +16,8 @@ One entry per task where an AI agent wrote or modified files. See `AGENTS.md` fo
 - Tool: Claude Code (Sonnet 5)
 - Task: Wire the Login feature end-to-end: server-side UserService.login (FakeData-backed), the LoginLambda handler (200/400 responses with CORS), the LoginFunction resource in template.yaml (POST /login on TweeterApi, esbuild build method), ServerFacade.login on the client, and tweeter-web's UserService.login updated to call it instead of FakeData. (tweeter-web/src/network/ClientCommunicator.ts was written by the user, not the agent, in a separate commit.)
 - Review: TODO (pending sam build/deploy and the browser test)
+
+## 2026-11-16: tweeter-server/scripts/bundle.mjs (new file), tweeter-server/package.json, tweeter-server/template.yaml, tweeter-server/.gitignore, AGENTS.md, tweeter-web/src/network/ServerFacade.ts, package.json
+- Tool: Claude Code (Sonnet 5)
+- Task: Fix `sam build` failing to resolve the `tweeter-shared` import (SAM's built-in esbuild and makefile build methods both copy tweeter-server into an isolated scratch directory first, which breaks the npm-workspace symlink to the sibling tweeter-shared folder). Added a standalone esbuild bundling script (scripts/bundle.mjs) that runs before `sam build`, bundling each Lambda in the real repo tree so the symlink resolves; updated template.yaml's LoginFunction to point CodeUri at the pre-bundled output with no Metadata.BuildMethod needed. Updated AGENTS.md's command list accordingly. After a successful `sam deploy`, set ServerFacade.SERVER_URL to the deployed API Gateway URL.
+- Review: Ran `npm run bundle`, `sam build`, and `sam deploy --guided` myself; tested the deployed Lambda in the console and via curl, both succeeded.

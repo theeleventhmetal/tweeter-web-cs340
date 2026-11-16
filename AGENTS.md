@@ -14,7 +14,8 @@ This milestone (M3) moves backend logic out of the client's `FakeData`-backed se
 - Test web: `cd tweeter-web && npm test`
 - Type check web: `cd tweeter-web && npx tsc --noEmit`
 - Run web dev server: `cd tweeter-web && npm start`
-- Build/validate SAM (once `tweeter-server` exists): `cd tweeter-server && sam build && sam validate`
+- Bundle Lambdas for SAM (required before every `sam build` — see note below): `cd tweeter-server && npm run bundle`
+- Build/validate SAM: `cd tweeter-server && sam build && sam validate`
 - Deploy SAM: `cd tweeter-server && sam deploy`
 
 ## Conventions
