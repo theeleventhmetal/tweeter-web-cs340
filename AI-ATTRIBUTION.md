@@ -11,3 +11,8 @@ One entry per task where an AI agent wrote or modified files. See `AGENTS.md` fo
 - Tool: Claude Code (Sonnet 5)
 - Task: Scaffold the tweeter-server SAM workspace: add it to the root npm workspaces, give it a package.json depending on tweeter-shared, a tsconfig.json per the course's recommended compiler options, and a minimal template.yaml (Globals + an explicit AWS::Serverless::Api resource named TweeterApi, zero Lambdas yet).
 - Review: Ran `sam validate` and `sam build` myself; both succeeded.
+
+## 2026-11-16: tweeter-server/src/service/UserService.ts (new file), tweeter-server/src/lambda/util/corsHeaders.ts (new file), tweeter-server/src/lambda/handler/LoginLambda.ts (new file), tweeter-server/template.yaml, tweeter-web/src/network/ServerFacade.ts (new file), tweeter-web/src/model.service/UserService.ts
+- Tool: Claude Code (Sonnet 5)
+- Task: Wire the Login feature end-to-end: server-side UserService.login (FakeData-backed), the LoginLambda handler (200/400 responses with CORS), the LoginFunction resource in template.yaml (POST /login on TweeterApi, esbuild build method), ServerFacade.login on the client, and tweeter-web's UserService.login updated to call it instead of FakeData. (tweeter-web/src/network/ClientCommunicator.ts was written by the user, not the agent, in a separate commit.)
+- Review: TODO (pending sam build/deploy and the browser test)
