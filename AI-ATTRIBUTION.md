@@ -6,3 +6,8 @@ One entry per task where an AI agent wrote or modified files. See `AGENTS.md` fo
 - Tool: Claude Code (Sonnet 5)
 - Task: Add toDto()/static fromDto() to the User, AuthToken, Status, and Follow domain classes, and add request/response interfaces (TweeterRequest/Response, PagedItemRequest/Response<T>, AuthRequest/Response, RegisterRequest, GetUserRequest/Response, UserCountRequest/CountResponse, IsFollowerRequest/Response, FollowActionRequest/Response, PostStatusRequest) covering all 14 Milestone 3 endpoints, exported from tweeter-shared/src/index.ts. Pure shared-module types; no server or client wiring yet.
 - Review: Reviewed the diff and the type shapes against the plan; kept as written.
+
+## 2026-11-15: package.json, tweeter-server/package.json (new file), tweeter-server/tsconfig.json (new file), tweeter-server/template.yaml (new file), tweeter-server/.gitignore (new file)
+- Tool: Claude Code (Sonnet 5)
+- Task: Scaffold the tweeter-server SAM workspace: add it to the root npm workspaces, give it a package.json depending on tweeter-shared, a tsconfig.json per the course's recommended compiler options, and a minimal template.yaml (Globals + an explicit AWS::Serverless::Api resource named TweeterApi, zero Lambdas yet).
+- Review: Ran `sam validate` and `sam build` myself; both succeeded.

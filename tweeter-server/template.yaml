@@ -1,0 +1,31 @@
+# AI-assisted: see AI-ATTRIBUTION.md
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  tweeter-server - Lambda + API Gateway backend for the Tweeter Milestone 3 Web API.
+  Every endpoint is POST, with the auth token in the JSON body (per course guidance,
+  this keeps API Gateway configuration simple compared to REST-ful verbs/headers).
+
+Globals:
+  Function:
+    Runtime: nodejs20.x
+    Timeout: 10
+    MemorySize: 128
+
+Resources:
+  TweeterApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Cors:
+        AllowMethods: "'POST,OPTIONS'"
+        AllowHeaders: "'Content-Type'"
+        AllowOrigin: "'*'"
+
+  # Lambda functions are added here one at a time, each with an Events: Api
+  # entry pointing at TweeterApi, as each Milestone 3 task is completed.
+
+Outputs:
+  TweeterApiUrl:
+    Description: "Base URL of the Tweeter Web API"
+    Value: !Sub "https://${TweeterApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
