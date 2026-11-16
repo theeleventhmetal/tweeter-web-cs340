@@ -22,8 +22,30 @@ Resources:
         AllowHeaders: "'Content-Type'"
         AllowOrigin: "'*'"
 
-  # Lambda functions are added here one at a time, each with an Events: Api
-  # entry pointing at TweeterApi, as each Milestone 3 task is completed.
+  LoginFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: "es2022"
+        Sourcemap: true
+        EntryPoints:
+          - src/lambda/handler/LoginLambda.ts
+    Properties:
+      CodeUri: .
+      Handler: LoginLambda.handler
+      Events:
+        LoginApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TweeterApi
+            Path: /login
+            Method: post
+
+  # Further Lambda functions are added here one at a time, each with an
+  # Events: Api entry pointing at TweeterApi, as each Milestone 3 task is
+  # completed.
 
 Outputs:
   TweeterApiUrl:
