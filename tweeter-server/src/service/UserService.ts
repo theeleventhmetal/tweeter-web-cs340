@@ -14,4 +14,9 @@ export class UserService {
 
     return [user, FakeData.instance.authToken];
   }
+
+  public async logout(authToken: AuthToken): Promise<void> {
+    // No server-side session state to invalidate yet at this milestone -
+    // FakeData has no concept of an active session.
+  }
 }

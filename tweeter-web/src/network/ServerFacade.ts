@@ -1,9 +1,10 @@
 // AI-assisted: see AI-ATTRIBUTION.md
-import { AuthRequest, AuthResponse, AuthToken, User } from "tweeter-shared";
+import { AuthRequest, AuthResponse, AuthToken, TweeterRequest, TweeterResponse, User } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
 
 export class ServerFacade {
-  private SERVER_URL = "https://9n40e5oxh2.execute-api.us-east-1.amazonaws.com/Prod";
+  private SERVER_URL =
+    "https://9n40e5oxh2.execute-api.us-east-1.amazonaws.com/Prod";
 
   private clientCommunicator = new ClientCommunicator(this.SERVER_URL);
 
@@ -25,5 +26,15 @@ export class ServerFacade {
     }
 
     return [user, authToken];
+  }
+
+  public async logout(request: TweeterRequest): Promise<void> {
+    const response = await this.clientCommunicator.doPost<
+      TweeterRequest,
+      TweeterResponse>(request, "/logout");
+
+    if (!response.success) {
+      throw new Error(response.message ?? "Logout failed")
+    }
   }
 }
