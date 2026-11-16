@@ -19,4 +19,8 @@ export class UserService {
     // No server-side session state to invalidate yet at this milestone -
     // FakeData has no concept of an active session.
   }
+
+  public async getUser(authToken: AuthToken, alias: string): Promise<User | null> {
+    return FakeData.instance.findUserByAlias(alias);
+  }
 }

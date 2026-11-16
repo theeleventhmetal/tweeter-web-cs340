@@ -16,6 +16,7 @@ import * as esbuild from "esbuild";
 const functions = [
   { name: "LoginFunction", entry: "src/lambda/handler/LoginLambda.ts" },
   { name: "LogoutFunction", entry: "src/lambda/handler/LogoutLambda.ts" },
+  { name: "GetUserFunction", entry: "src/lambda/handler/GetUserLambda.ts" },
 ];
 
 for (const fn of functions) {

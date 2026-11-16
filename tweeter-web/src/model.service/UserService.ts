@@ -11,8 +11,7 @@ export class UserService implements Service {
     authToken: AuthToken,
     alias: string,
   ): Promise<User | null> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.findUserByAlias(alias);
+    return this.serverFacade.getUser({ authToken: authToken.toDto(), alias });
   }
 
   public async login(
