@@ -1,15 +1,23 @@
-import { AuthToken, Status, FakeData } from "tweeter-shared";
+// AI-assisted: see AI-ATTRIBUTION.md
+import { AuthToken, Status } from "tweeter-shared";
 import { Service } from "./Service";
+import { ServerFacade } from "../network/ServerFacade";
 
 export class StatusService implements Service {
+  private serverFacade = new ServerFacade();
+
   loadMoreFeedItems = async (
     authToken: AuthToken,
     userAlias: string,
     pageSize: number,
     lastItem: Status | null,
   ): Promise<[Status[], boolean]> => {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
+    return this.serverFacade.getFeed({
+      authToken: authToken.toDto(),
+      userAlias,
+      pageSize,
+      lastItem: lastItem?.toDto() ?? null,
+    });
   };
 
   loadMoreStoryItems = async (
@@ -18,8 +26,12 @@ export class StatusService implements Service {
     pageSize: number,
     lastItem: Status | null,
   ): Promise<[Status[], boolean]> => {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
+    return this.serverFacade.getStory({
+      authToken: authToken.toDto(),
+      userAlias,
+      pageSize,
+      lastItem: lastItem?.toDto() ?? null,
+    });
   };
 
   postStatus = async (
