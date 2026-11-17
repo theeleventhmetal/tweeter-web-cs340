@@ -18,6 +18,9 @@ const functions = [
   { name: "LogoutFunction", entry: "src/lambda/handler/LogoutLambda.ts" },
   { name: "GetUserFunction", entry: "src/lambda/handler/GetUserLambda.ts" },
   { name: "RegisterFunction", entry: "src/lambda/handler/RegisterLambda.ts" },
+  { name: "IsFollowerFunction", entry: "src/lambda/handler/IsFollowerLambda.ts" },
+  { name: "GetFolloweeCountFunction", entry: "src/lambda/handler/GetFolloweeCountLambda.ts" },
+  { name: "GetFollowerCountFunction", entry: "src/lambda/handler/GetFollowerCountLambda.ts" },
 ];
 
 for (const fn of functions) {

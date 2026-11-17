@@ -74,6 +74,45 @@ Resources:
             Path: /register
             Method: post
 
+  IsFollowerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist-lambdas/IsFollowerFunction
+      Handler: index.handler
+      Events:
+        IsFollowerApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TweeterApi
+            Path: /is-follower
+            Method: post
+
+  GetFolloweeCountFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist-lambdas/GetFolloweeCountFunction
+      Handler: index.handler
+      Events:
+        GetFolloweeCountApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TweeterApi
+            Path: /followee-count
+            Method: post
+
+  GetFollowerCountFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist-lambdas/GetFollowerCountFunction
+      Handler: index.handler
+      Events:
+        GetFollowerCountApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TweeterApi
+            Path: /follower-count
+            Method: post
+
   # Further Lambda functions are added here one at a time, each with an
   # Events: Api entry pointing at TweeterApi, as each Milestone 3 task is
   # completed.

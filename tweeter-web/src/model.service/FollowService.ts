@@ -1,7 +1,11 @@
+// AI-assisted: see AI-ATTRIBUTION.md
 import { AuthToken, User, FakeData } from "tweeter-shared";
 import { Service } from "./Service";
+import { ServerFacade } from "../network/ServerFacade";
 
 export class FollowService implements Service{
+  private serverFacade = new ServerFacade();
+
   public async loadMoreFollowees(
     authToken: AuthToken,
     userAlias: string,
@@ -27,23 +31,30 @@ export class FollowService implements Service{
     user: User,
     selectedUser: User,
   ): Promise<boolean> => {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.isFollower();
+    return this.serverFacade.getIsFollowerStatus({
+      authToken: authToken.toDto(),
+      user: user.toDto(),
+      selectedUser: selectedUser.toDto(),
+    });
   };
   getFolloweeCount = async (
     authToken: AuthToken,
     user: User,
   ): Promise<number> => {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getFolloweeCount(user.alias);
+    return this.serverFacade.getFolloweeCount({
+      authToken: authToken.toDto(),
+      user: user.toDto(),
+    });
   };
 
   getFollowerCount = async (
     authToken: AuthToken,
     user: User,
   ): Promise<number> => {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getFollowerCount(user.alias);
+    return this.serverFacade.getFollowerCount({
+      authToken: authToken.toDto(),
+      user: user.toDto(),
+    });
   };
 
   follow = async (

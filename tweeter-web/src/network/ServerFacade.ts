@@ -1,5 +1,5 @@
 // AI-assisted: see AI-ATTRIBUTION.md
-import { AuthRequest, AuthResponse, AuthToken, GetUserRequest, GetUserResponse, RegisterRequest, TweeterRequest, TweeterResponse, User } from "tweeter-shared";
+import { AuthRequest, AuthResponse, AuthToken, CountResponse, GetUserRequest, GetUserResponse, IsFollowerRequest, IsFollowerResponse, RegisterRequest, TweeterRequest, TweeterResponse, User, UserCountRequest } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
 
 export class ServerFacade {
@@ -69,5 +69,44 @@ export class ServerFacade {
     }
 
     return [user, authToken];
+  }
+
+  public async getIsFollowerStatus(request: IsFollowerRequest): Promise<boolean> {
+    const response = await this.clientCommunicator.doPost<
+      IsFollowerRequest,
+      IsFollowerResponse
+    >(request, "/is-follower");
+
+    if (!response.success) {
+      throw new Error(response.message ?? "Get is-follower status failed");
+    }
+
+    return response.isFollower;
+  }
+
+  public async getFolloweeCount(request: UserCountRequest): Promise<number> {
+    const response = await this.clientCommunicator.doPost<
+      UserCountRequest,
+      CountResponse
+    >(request, "/followee-count");
+
+    if (!response.success) {
+      throw new Error(response.message ?? "Get followee count failed");
+    }
+
+    return response.count;
+  }
+
+  public async getFollowerCount(request: UserCountRequest): Promise<number> {
+    const response = await this.clientCommunicator.doPost<
+      UserCountRequest,
+      CountResponse
+    >(request, "/follower-count");
+
+    if (!response.success) {
+      throw new Error(response.message ?? "Get follower count failed");
+    }
+
+    return response.count;
   }
 }
