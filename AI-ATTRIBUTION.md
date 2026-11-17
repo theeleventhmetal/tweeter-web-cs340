@@ -77,6 +77,11 @@ One entry per task where an AI agent wrote or modified files. See `AGENTS.md` fo
 - Task: Client wiring for postStatus (ServerFacade.postStatus + client StatusService.postStatus combined into one commit, since the commit-spacing goal was already cleared) - replaces the 2-second setTimeout placeholder with a real call to /post-status. This is the 14th and last feature; confirmed no FakeData references remain anywhere in tweeter-web/src/model.service/.
 - Review: Ran `npx tsc --noEmit` and the full test suite (16/16 pass) myself, posted a status in the running app, and grepped model.service/ for FakeData (no results).
 
+## 2026-11-17: tweeter-web/package.json, tweeter-web/test/network/ServerFacade.test.ts (new file), tweeter-web/test/model.service/StatusService.test.ts (new file)
+- Tool: Claude Code (Sonnet 5)
+- Task: Milestone 3's required integration tests. Installed isomorphic-fetch per the course's note about jsdom lacking fetch. ServerFacade.test.ts (true integration tests against the live deployed API): register (expects the first FakeData user, Allen Anderson, per the course's own note), getFollowers (expects a specific page of 10 users with @allen omitted, derived from FakeData's known deterministic user-list order), getFollowerCount (expects >0, per the course's note). StatusService.test.ts: loadMoreStoryItems against the live API, expecting a specific first status derived from FakeData.generateFakeStatuses's known deterministic generation order (sender @allen, mentions @amy, timestamp 0). All expected values were derived from reading FakeData.ts's actual deterministic logic, not from running the code and copying its output.
+- Review: Ran `npx tsc --noEmit` and the full test suite myself (20/20 pass, including the 4 new integration tests hitting the live API).
+
 ## 2026-11-17: tweeter-web/src/network/ServerFacade.ts
 - Tool: Claude Code (Sonnet 5)
 - Task: Client network-layer wiring for feed/story (separate commit from the client UserService/StatusService wiring, per the commit-spacing request): ServerFacade.getFeed/getStory, calling the now-deployed /feed and /story endpoints and converting StatusDto results back to Status via fromDto.
