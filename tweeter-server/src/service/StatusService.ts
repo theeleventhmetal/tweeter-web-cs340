@@ -19,4 +19,8 @@ export class StatusService {
   ): Promise<[Status[], boolean]> {
     return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
   }
+
+  public async postStatus(authToken: AuthToken, newStatus: Status): Promise<void> {
+    // No persistent storage yet at this milestone - nothing to actually save.
+  }
 }

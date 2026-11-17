@@ -67,6 +67,11 @@ One entry per task where an AI agent wrote or modified files. See `AGENTS.md` fo
 - Task: Final piece of Task 10: client StatusService.loadMoreFeedItems/loadMoreStoryItems updated to call ServerFacade.getFeed/getStory instead of FakeData. Removed the now-unused FakeData import (postStatus, the one remaining method, never used it either).
 - Review: Ran `npx tsc --noEmit` and the full test suite (16/16 pass) myself, and scrolled the main feed and a profile's story tab in the running app - both pulling from the real endpoints.
 
+## 2026-11-17: tweeter-server/src/service/StatusService.ts, tweeter-server/src/lambda/handler/PostStatusLambda.ts (new file), tweeter-server/template.yaml, tweeter-server/scripts/bundle.mjs
+- Tool: Claude Code (Sonnet 5)
+- Task: Server side only for postStatus (same split as feed/story, separate commit from client wiring): StatusService.postStatus (no-op - no persistent storage yet at this milestone, matching the client's old M2 behavior which also did nothing but pause), PostStatusLambda handler, template.yaml/bundle.mjs entries for POST /post-status. No client wiring yet.
+- Review: Ran `npx tsc --noEmit` (server side) myself; deployed with `npm run bundle`/`sam build`/`sam deploy`.
+
 ## 2026-11-17: tweeter-web/src/network/ServerFacade.ts
 - Tool: Claude Code (Sonnet 5)
 - Task: Client network-layer wiring for feed/story (separate commit from the client UserService/StatusService wiring, per the commit-spacing request): ServerFacade.getFeed/getStory, calling the now-deployed /feed and /story endpoints and converting StatusDto results back to Status via fromDto.
