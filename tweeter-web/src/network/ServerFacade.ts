@@ -1,5 +1,5 @@
 // AI-assisted: see AI-ATTRIBUTION.md
-import { AuthRequest, AuthResponse, AuthToken, CountResponse, FollowActionRequest, FollowActionResponse, GetUserRequest, GetUserResponse, IsFollowerRequest, IsFollowerResponse, RegisterRequest, TweeterRequest, TweeterResponse, User, UserCountRequest } from "tweeter-shared";
+import { AuthRequest, AuthResponse, AuthToken, CountResponse, FollowActionRequest, FollowActionResponse, GetUserRequest, GetUserResponse, IsFollowerRequest, IsFollowerResponse, PagedItemRequest, PagedItemResponse, RegisterRequest, TweeterRequest, TweeterResponse, User, UserCountRequest, UserDto } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
 
 export class ServerFacade {
@@ -138,5 +138,39 @@ export class ServerFacade {
     }
 
     return [response.followerCount, response.followeeCount];
+  }
+
+  public async getFollowees(
+    request: PagedItemRequest<UserDto>
+  ): Promise<[User[], boolean]> {
+    const response = await this.clientCommunicator.doPost<
+      PagedItemRequest<UserDto>,
+      PagedItemResponse<UserDto>
+    >(request, "/followees");
+
+    if (!response.success) {
+      throw new Error(response.message ?? "Get followees failed");
+    }
+
+    const items = (response.items ?? []).map((dto) => User.fromDto(dto) as User);
+
+    return [items, response.hasMore];
+  }
+
+  public async getFollowers(
+    request: PagedItemRequest<UserDto>
+  ): Promise<[User[], boolean]> {
+    const response = await this.clientCommunicator.doPost<
+      PagedItemRequest<UserDto>,
+      PagedItemResponse<UserDto>
+    >(request, "/followers");
+
+    if (!response.success) {
+      throw new Error(response.message ?? "Get followers failed");
+    }
+
+    const items = (response.items ?? []).map((dto) => User.fromDto(dto) as User);
+
+    return [items, response.hasMore];
   }
 }

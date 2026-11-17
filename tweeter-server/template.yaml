@@ -139,6 +139,32 @@ Resources:
             Path: /unfollow
             Method: post
 
+  GetFolloweesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist-lambdas/GetFolloweesFunction
+      Handler: index.handler
+      Events:
+        GetFolloweesApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TweeterApi
+            Path: /followees
+            Method: post
+
+  GetFollowersFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist-lambdas/GetFollowersFunction
+      Handler: index.handler
+      Events:
+        GetFollowersApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TweeterApi
+            Path: /followers
+            Method: post
+
   # Further Lambda functions are added here one at a time, each with an
   # Events: Api entry pointing at TweeterApi, as each Milestone 3 task is
   # completed.

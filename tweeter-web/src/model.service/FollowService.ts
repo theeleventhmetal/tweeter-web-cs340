@@ -1,5 +1,5 @@
 // AI-assisted: see AI-ATTRIBUTION.md
-import { AuthToken, User, FakeData } from "tweeter-shared";
+import { AuthToken, User } from "tweeter-shared";
 import { Service } from "./Service";
 import { ServerFacade } from "../network/ServerFacade";
 
@@ -12,8 +12,12 @@ export class FollowService implements Service{
     pageSize: number,
     lastItem: User | null,
   ): Promise<[User[], boolean]> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfUsers(lastItem, pageSize, userAlias);
+    return this.serverFacade.getFollowees({
+      authToken: authToken.toDto(),
+      userAlias,
+      pageSize,
+      lastItem: lastItem?.toDto() ?? null,
+    });
   }
 
   public async loadMoreFollowers(
@@ -22,8 +26,12 @@ export class FollowService implements Service{
     pageSize: number,
     lastItem: User | null,
   ): Promise<[User[], boolean]> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfUsers(lastItem, pageSize, userAlias);
+    return this.serverFacade.getFollowers({
+      authToken: authToken.toDto(),
+      userAlias,
+      pageSize,
+      lastItem: lastItem?.toDto() ?? null,
+    });
   }
 
   getIsFollowerStatus = async (
