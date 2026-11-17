@@ -61,6 +61,19 @@ Resources:
             Path: /get-user
             Method: post
 
+  RegisterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist-lambdas/RegisterFunction
+      Handler: index.handler
+      Events:
+        RegisterApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref TweeterApi
+            Path: /register
+            Method: post
+
   # Further Lambda functions are added here one at a time, each with an
   # Events: Api entry pointing at TweeterApi, as each Milestone 3 task is
   # completed.

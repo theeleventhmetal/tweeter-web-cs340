@@ -1,5 +1,5 @@
 // AI-assisted: see AI-ATTRIBUTION.md
-import { AuthRequest, AuthResponse, AuthToken, GetUserRequest, GetUserResponse, TweeterRequest, TweeterResponse, User } from "tweeter-shared";
+import { AuthRequest, AuthResponse, AuthToken, GetUserRequest, GetUserResponse, RegisterRequest, TweeterRequest, TweeterResponse, User } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
 
 export class ServerFacade {
@@ -49,5 +49,25 @@ export class ServerFacade {
     }
 
     return User.fromDto(response.user);
+  }
+
+  public async register(request: RegisterRequest): Promise<[User, AuthToken]> {
+    const response = await this.clientCommunicator.doPost<
+      RegisterRequest,
+      AuthResponse
+    >(request, "/register");
+
+    if (!response.success) {
+      throw new Error(response.message ?? "Register failed");
+    }
+
+    const user = User.fromDto(response.user);
+    const authToken = AuthToken.fromDto(response.authToken);
+
+    if (user == null || authToken == null) {
+      throw new Error("Invalid register response from server");
+    }
+
+    return [user, authToken];
   }
 }
