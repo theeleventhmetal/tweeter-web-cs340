@@ -1,5 +1,5 @@
 // AI-assisted: see AI-ATTRIBUTION.md
-import { AuthRequest, AuthResponse, AuthToken, CountResponse, FollowActionRequest, FollowActionResponse, GetUserRequest, GetUserResponse, IsFollowerRequest, IsFollowerResponse, PagedItemRequest, PagedItemResponse, RegisterRequest, TweeterRequest, TweeterResponse, User, UserCountRequest, UserDto } from "tweeter-shared";
+import { AuthRequest, AuthResponse, AuthToken, CountResponse, FollowActionRequest, FollowActionResponse, GetUserRequest, GetUserResponse, IsFollowerRequest, IsFollowerResponse, PagedItemRequest, PagedItemResponse, RegisterRequest, Status, StatusDto, TweeterRequest, TweeterResponse, User, UserCountRequest, UserDto } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
 
 export class ServerFacade {
@@ -170,6 +170,44 @@ export class ServerFacade {
     }
 
     const items = (response.items ?? []).map((dto) => User.fromDto(dto) as User);
+
+    return [items, response.hasMore];
+  }
+
+  public async getFeed(
+    request: PagedItemRequest<StatusDto>
+  ): Promise<[Status[], boolean]> {
+    const response = await this.clientCommunicator.doPost<
+      PagedItemRequest<StatusDto>,
+      PagedItemResponse<StatusDto>
+    >(request, "/feed");
+
+    if (!response.success) {
+      throw new Error(response.message ?? "Get feed failed");
+    }
+
+    const items = (response.items ?? []).map(
+      (dto) => Status.fromDto(dto) as Status
+    );
+
+    return [items, response.hasMore];
+  }
+
+  public async getStory(
+    request: PagedItemRequest<StatusDto>
+  ): Promise<[Status[], boolean]> {
+    const response = await this.clientCommunicator.doPost<
+      PagedItemRequest<StatusDto>,
+      PagedItemResponse<StatusDto>
+    >(request, "/story");
+
+    if (!response.success) {
+      throw new Error(response.message ?? "Get story failed");
+    }
+
+    const items = (response.items ?? []).map(
+      (dto) => Status.fromDto(dto) as Status
+    );
 
     return [items, response.hasMore];
   }
