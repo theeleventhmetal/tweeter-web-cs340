@@ -72,6 +72,11 @@ One entry per task where an AI agent wrote or modified files. See `AGENTS.md` fo
 - Task: Server side only for postStatus (same split as feed/story, separate commit from client wiring): StatusService.postStatus (no-op - no persistent storage yet at this milestone, matching the client's old M2 behavior which also did nothing but pause), PostStatusLambda handler, template.yaml/bundle.mjs entries for POST /post-status. No client wiring yet.
 - Review: Ran `npx tsc --noEmit` (server side) myself; deployed with `npm run bundle`/`sam build`/`sam deploy`.
 
+## 2026-11-17: tweeter-web/src/network/ServerFacade.ts, tweeter-web/src/model.service/StatusService.ts
+- Tool: Claude Code (Sonnet 5)
+- Task: Client wiring for postStatus (ServerFacade.postStatus + client StatusService.postStatus combined into one commit, since the commit-spacing goal was already cleared) - replaces the 2-second setTimeout placeholder with a real call to /post-status. This is the 14th and last feature; confirmed no FakeData references remain anywhere in tweeter-web/src/model.service/.
+- Review: Ran `npx tsc --noEmit` and the full test suite (16/16 pass) myself, posted a status in the running app, and grepped model.service/ for FakeData (no results).
+
 ## 2026-11-17: tweeter-web/src/network/ServerFacade.ts
 - Tool: Claude Code (Sonnet 5)
 - Task: Client network-layer wiring for feed/story (separate commit from the client UserService/StatusService wiring, per the commit-spacing request): ServerFacade.getFeed/getStory, calling the now-deployed /feed and /story endpoints and converting StatusDto results back to Status via fromDto.

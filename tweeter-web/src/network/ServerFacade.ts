@@ -1,5 +1,5 @@
 // AI-assisted: see AI-ATTRIBUTION.md
-import { AuthRequest, AuthResponse, AuthToken, CountResponse, FollowActionRequest, FollowActionResponse, GetUserRequest, GetUserResponse, IsFollowerRequest, IsFollowerResponse, PagedItemRequest, PagedItemResponse, RegisterRequest, Status, StatusDto, TweeterRequest, TweeterResponse, User, UserCountRequest, UserDto } from "tweeter-shared";
+import { AuthRequest, AuthResponse, AuthToken, CountResponse, FollowActionRequest, FollowActionResponse, GetUserRequest, GetUserResponse, IsFollowerRequest, IsFollowerResponse, PagedItemRequest, PagedItemResponse, PostStatusRequest, RegisterRequest, Status, StatusDto, TweeterRequest, TweeterResponse, User, UserCountRequest, UserDto } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
 
 export class ServerFacade {
@@ -210,5 +210,16 @@ export class ServerFacade {
     );
 
     return [items, response.hasMore];
+  }
+
+  public async postStatus(request: PostStatusRequest): Promise<void> {
+    const response = await this.clientCommunicator.doPost<
+      PostStatusRequest,
+      TweeterResponse
+    >(request, "/post-status");
+
+    if (!response.success) {
+      throw new Error(response.message ?? "Post status failed");
+    }
   }
 }
