@@ -10,4 +10,13 @@ export class StatusService {
   ): Promise<[Status[], boolean]> {
     return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
   }
+
+  public async loadMoreStoryItems(
+    authToken: AuthToken,
+    userAlias: string,
+    pageSize: number,
+    lastItem: Status | null
+  ): Promise<[Status[], boolean]> {
+    return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
+  }
 }

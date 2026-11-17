@@ -61,3 +61,8 @@ One entry per task where an AI agent wrote or modified files. See `AGENTS.md` fo
 - Tool: Claude Code (Sonnet 5)
 - Task: Server side only for the feed endpoint (split from the client side into a separate commit, at the user's request, to spread Milestone 3 work across more commits): new server StatusService with loadMoreFeedItems (FakeData.getPageOfStatuses), GetFeedLambda handler using PagedItemRequest<StatusDto>/PagedItemResponse<StatusDto>, template.yaml/bundle.mjs entries for POST /feed. No client wiring yet.
 - Review: Ran `npx tsc --noEmit` (server side) myself; deployed with `npm run bundle`/`sam build`/`sam deploy`.
+
+## 2026-11-17: tweeter-server/src/service/StatusService.ts, tweeter-server/src/lambda/handler/GetStoryLambda.ts (new file), tweeter-server/template.yaml, tweeter-server/scripts/bundle.mjs
+- Tool: Claude Code (Sonnet 5)
+- Task: Server side only for the story endpoint (same split as feed, separate commit from client wiring): StatusService.loadMoreStoryItems (identical shape to loadMoreFeedItems, FakeData.getPageOfStatuses), GetStoryLambda handler, template.yaml/bundle.mjs entries for POST /story. No client wiring yet.
+- Review: Ran `npx tsc --noEmit` (server side) myself; deployed with `npm run bundle`/`sam build`/`sam deploy`.

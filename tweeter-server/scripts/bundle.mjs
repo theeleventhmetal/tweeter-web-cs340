@@ -26,6 +26,7 @@ const functions = [
   { name: "GetFolloweesFunction", entry: "src/lambda/handler/GetFolloweesLambda.ts" },
   { name: "GetFollowersFunction", entry: "src/lambda/handler/GetFollowersLambda.ts" },
   { name: "GetFeedFunction", entry: "src/lambda/handler/GetFeedLambda.ts" },
+  { name: "GetStoryFunction", entry: "src/lambda/handler/GetStoryLambda.ts" },
 ];
 
 for (const fn of functions) {
