@@ -96,9 +96,10 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
     isFollowerAfter: boolean,
     operationDescription: string,
   ): Promise<void> {
+    const infoMessageId = this.view.displayInfoMessage(infoMessage, 0);
+
     await this.doFailureReportingOperation(async () => {
       this.view.setIsLoading(true);
-      this.view.displayInfoMessage(infoMessage, 0);
 
       const [followerCount, followeeCount] = await serviceCall();
 
@@ -107,7 +108,7 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
       this.view.setFolloweeCount(followeeCount);
     }, operationDescription);
 
-    this.view.deleteMessage("");
+    this.view.deleteMessage(infoMessageId);
     this.view.setIsLoading(false);
   }
 }
