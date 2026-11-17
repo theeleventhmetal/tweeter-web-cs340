@@ -21,6 +21,8 @@ const functions = [
   { name: "IsFollowerFunction", entry: "src/lambda/handler/IsFollowerLambda.ts" },
   { name: "GetFolloweeCountFunction", entry: "src/lambda/handler/GetFolloweeCountLambda.ts" },
   { name: "GetFollowerCountFunction", entry: "src/lambda/handler/GetFollowerCountLambda.ts" },
+  { name: "FollowFunction", entry: "src/lambda/handler/FollowLambda.ts" },
+  { name: "UnfollowFunction", entry: "src/lambda/handler/UnfollowLambda.ts" },
 ];
 
 for (const fn of functions) {

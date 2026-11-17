@@ -1,5 +1,5 @@
 // AI-assisted: see AI-ATTRIBUTION.md
-import { AuthRequest, AuthResponse, AuthToken, CountResponse, GetUserRequest, GetUserResponse, IsFollowerRequest, IsFollowerResponse, RegisterRequest, TweeterRequest, TweeterResponse, User, UserCountRequest } from "tweeter-shared";
+import { AuthRequest, AuthResponse, AuthToken, CountResponse, FollowActionRequest, FollowActionResponse, GetUserRequest, GetUserResponse, IsFollowerRequest, IsFollowerResponse, RegisterRequest, TweeterRequest, TweeterResponse, User, UserCountRequest } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
 
 export class ServerFacade {
@@ -108,5 +108,35 @@ export class ServerFacade {
     }
 
     return response.count;
+  }
+
+  public async follow(
+    request: FollowActionRequest
+  ): Promise<[followerCount: number, followeeCount: number]> {
+    const response = await this.clientCommunicator.doPost<
+      FollowActionRequest,
+      FollowActionResponse
+    >(request, "/follow");
+
+    if (!response.success) {
+      throw new Error(response.message ?? "Follow failed");
+    }
+
+    return [response.followerCount, response.followeeCount];
+  }
+
+  public async unfollow(
+    request: FollowActionRequest
+  ): Promise<[followerCount: number, followeeCount: number]> {
+    const response = await this.clientCommunicator.doPost<
+      FollowActionRequest,
+      FollowActionResponse
+    >(request, "/unfollow");
+
+    if (!response.success) {
+      throw new Error(response.message ?? "Unfollow failed");
+    }
+
+    return [response.followerCount, response.followeeCount];
   }
 }
