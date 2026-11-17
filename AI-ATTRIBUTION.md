@@ -56,3 +56,8 @@ One entry per task where an AI agent wrote or modified files. See `AGENTS.md` fo
 - Tool: Claude Code (Sonnet 5)
 - Task: Bug fix (user-reported, unrelated to the Milestone 3 endpoint work): follow/unfollow toasts never disappeared. Root cause: updateFollowStatus never captured the ID returned by view.displayInfoMessage(...) and called view.deleteMessage("") instead of the real ID, so the delete never matched anything. Confirmed via git log this predates all Milestone 3 commits - a pre-existing bug in the Milestone 2 starter code. Fixed by capturing the ID and passing it to deleteMessage; also moved displayInfoMessage outside doFailureReportingOperation so the ID is captured unconditionally and the toast gets cleaned up even if the follow/unfollow call fails (doFailureReportingOperation catches internally and never rethrows).
 - Review: Ran `npx tsc --noEmit` and the full test suite (16/16 pass) myself, and confirmed in the running app that the toast now disappears correctly after follow/unfollow.
+
+## 2026-11-17: tweeter-server/src/service/StatusService.ts (new file), tweeter-server/src/lambda/handler/GetFeedLambda.ts (new file), tweeter-server/template.yaml, tweeter-server/scripts/bundle.mjs
+- Tool: Claude Code (Sonnet 5)
+- Task: Server side only for the feed endpoint (split from the client side into a separate commit, at the user's request, to spread Milestone 3 work across more commits): new server StatusService with loadMoreFeedItems (FakeData.getPageOfStatuses), GetFeedLambda handler using PagedItemRequest<StatusDto>/PagedItemResponse<StatusDto>, template.yaml/bundle.mjs entries for POST /feed. No client wiring yet.
+- Review: Ran `npx tsc --noEmit` (server side) myself; deployed with `npm run bundle`/`sam build`/`sam deploy`.
