@@ -2,6 +2,11 @@
 
 One entry per task where an AI agent wrote or modified files. See `AGENTS.md` for the format and process.
 
+## 2026-11-21: tweeter-server/template.yaml
+- Tool: Claude Code (Sonnet 5)
+- Task: Milestone 4A infra: add the Users DynamoDB table (PK alias, PAY_PER_REQUEST billing so there's no idle provisioned capacity to remember to turn down) and grant RegisterFunction/LoginFunction/GetUserFunction a DynamoDBCrudPolicy on it plus a USERS_TABLE_NAME env var. No DynamoUserDao implementation yet - table exists but nothing reads/writes it.
+- Review: TODO
+
 ## 2026-11-21: tweeter-server/src/dao/DaoFactory.ts (new file)
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A: define the DaoFactory interface (Abstract Factory pattern) with one createXDao() method per DAO type. Services will take a DaoFactory via constructor injection and call these methods to get their DAOs, so they never call `new` on a concrete DAO class directly. No concrete factory implementation yet.

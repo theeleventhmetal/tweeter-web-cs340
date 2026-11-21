@@ -27,6 +27,12 @@ Resources:
     Properties:
       CodeUri: dist-lambdas/LoginFunction
       Handler: index.handler
+      Environment:
+        Variables:
+          USERS_TABLE_NAME: !Ref UsersTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersTable
       Events:
         LoginApi:
           Type: Api
@@ -53,6 +59,12 @@ Resources:
     Properties:
       CodeUri: dist-lambdas/GetUserFunction
       Handler: index.handler
+      Environment:
+        Variables:
+          USERS_TABLE_NAME: !Ref UsersTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersTable
       Events:
         GetUserApi:
           Type: Api
@@ -66,6 +78,12 @@ Resources:
     Properties:
       CodeUri: dist-lambdas/RegisterFunction
       Handler: index.handler
+      Environment:
+        Variables:
+          USERS_TABLE_NAME: !Ref UsersTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersTable
       Events:
         RegisterApi:
           Type: Api
@@ -207,6 +225,22 @@ Resources:
   # Further Lambda functions are added here one at a time, each with an
   # Events: Api entry pointing at TweeterApi, as each Milestone 3 task is
   # completed.
+
+  # DynamoDB tables and the S3 bucket are added here one at a time, each
+  # paired with the DAO(s) and Lambda Policies/Environment entries that use
+  # it, as each Milestone 4A task is completed. PAY_PER_REQUEST billing mode
+  # so there's no idle provisioned RCU/WCU to remember to turn down between
+  # sessions.
+  UsersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: alias
+          AttributeType: S
+      KeySchema:
+        - AttributeName: alias
+          KeyType: HASH
 
 Outputs:
   TweeterApiUrl:
