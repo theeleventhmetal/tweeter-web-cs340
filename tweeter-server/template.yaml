@@ -261,6 +261,12 @@ Resources:
     Properties:
       CodeUri: dist-lambdas/GetStoryFunction
       Handler: index.handler
+      Environment:
+        Variables:
+          STORY_TABLE_NAME: !Ref StoryTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref StoryTable
       Events:
         GetStoryApi:
           Type: Api
@@ -277,9 +283,12 @@ Resources:
       Environment:
         Variables:
           FOLLOWS_TABLE_NAME: !Ref FollowsTable
+          STORY_TABLE_NAME: !Ref StoryTable
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref FollowsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref StoryTable
       Events:
         PostStatusApi:
           Type: Api
@@ -347,6 +356,23 @@ Resources:
               KeyType: RANGE
           Projection:
             ProjectionType: ALL
+
+  # A user's own posted statuses (the Story tab). Items store the full
+  # denormalized StatusDto shape so reads need no join back to Users.
+  StoryTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: alias
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: N
+      KeySchema:
+        - AttributeName: alias
+          KeyType: HASH
+        - AttributeName: timestamp
+          KeyType: RANGE
 
   # Public-read bucket for profile images. Ownership/public-access settings
   # are declared here (rather than left as manual console steps) so ACL
