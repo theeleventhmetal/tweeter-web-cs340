@@ -2,6 +2,11 @@
 
 One entry per task where an AI agent wrote or modified files. See `AGENTS.md` for the format and process.
 
+## 2026-11-21: tweeter-server/src/dao/interface/FollowDao.ts (new file)
+- Tool: Claude Code (Sonnet 5)
+- Task: Milestone 4A DAO layer: define the database-agnostic FollowDao interface covering follow/unfollow, isFollower, follower/followee counts, paged alias lookups in both directions, and getAllFollowerAliases (used by the feed fan-out-on-write path added later). Works in plain aliases, not UserDto - callers resolve full user info via UserDao. No implementation yet.
+- Review: TODO
+
 ## 2026-11-21: tweeter-server/src/dao/interface/AuthTokenDao.ts (new file)
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A DAO layer: define the database-agnostic AuthTokenDao interface (createSession/getSession/deleteSession) and the SessionEntity shape (token, alias, epoch-seconds expiresAt) it operates on. Backs server-side session management. No implementation yet.
