@@ -2,6 +2,11 @@
 
 One entry per task where an AI agent wrote or modified files. See `AGENTS.md` for the format and process.
 
+## 2026-11-21: tweeter-server/src/dao/dynamodb/DynamoAuthTokenDao.ts (new file)
+- Tool: Claude Code (Sonnet 5)
+- Task: Milestone 4A: implement AuthTokenDao against the Sessions table (createSession/getSession/deleteSession via PutCommand/GetCommand/DeleteCommand). Table name from the SESSIONS_TABLE_NAME env var. Used by AuthorizationService next.
+- Review: TODO
+
 ## 2026-11-21: tweeter-server/template.yaml
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A infra: add the Sessions DynamoDB table (PK token, TTL on expiresAt for auto-cleanup once a session has expired). Granted on Globals.Function instead of per-function, since every one of the 14 Lambdas calls AuthorizationService.validate() and therefore needs Sessions table read/write - a DynamoDBCrudPolicy plus SESSIONS_TABLE_NAME env var there apply to all functions at once. No DynamoAuthTokenDao/AuthorizationService implementation yet.
