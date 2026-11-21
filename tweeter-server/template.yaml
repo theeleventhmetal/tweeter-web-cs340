@@ -11,6 +11,15 @@ Globals:
     Runtime: nodejs20.x
     Timeout: 10
     MemorySize: 128
+    # Every Lambda calls AuthorizationService.validate() on every
+    # authenticated request, so every Lambda needs Sessions table access -
+    # granted here once instead of repeated on all 14 functions below.
+    Environment:
+      Variables:
+        SESSIONS_TABLE_NAME: !Ref SessionsTable
+    Policies:
+      - DynamoDBCrudPolicy:
+          TableName: !Ref SessionsTable
 
 Resources:
   TweeterApi:
@@ -244,6 +253,20 @@ Resources:
       KeySchema:
         - AttributeName: alias
           KeyType: HASH
+
+  SessionsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: token
+          AttributeType: S
+      KeySchema:
+        - AttributeName: token
+          KeyType: HASH
+      TimeToLiveSpecification:
+        AttributeName: expiresAt
+        Enabled: true
 
   # Public-read bucket for profile images. Ownership/public-access settings
   # are declared here (rather than left as manual console steps) so ACL
