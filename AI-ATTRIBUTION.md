@@ -2,6 +2,11 @@
 
 One entry per task where an AI agent wrote or modified files. See `AGENTS.md` for the format and process.
 
+## 2026-11-21: tweeter-server/src/dao/interface/ImageDao.ts (new file)
+- Tool: Claude Code (Sonnet 5)
+- Task: Milestone 4A DAO layer: define the database-agnostic ImageDao interface (uploadImage, taking a filename and base64-encoded bytes, returning the public URL) used for S3 profile image uploads. Completes the set of 6 DAO interfaces. No implementation yet.
+- Review: TODO
+
 ## 2026-11-21: tweeter-server/src/dao/interface/FeedDao.ts (new file)
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A DAO layer: define the database-agnostic FeedDao interface for each user's pre-computed feed - addStatusToFeeds (batch fan-out write to a list of followers, called from postStatus) and a paged getPageOfFeed. Per the spec's requirement that feed contents be pre-computed rather than calculated at read time. No implementation yet.
