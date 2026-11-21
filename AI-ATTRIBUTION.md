@@ -2,6 +2,11 @@
 
 One entry per task where an AI agent wrote or modified files. See `AGENTS.md` for the format and process.
 
+## 2026-11-21: tweeter-server/src/dao/dynamodb/DynamoStatusDao.ts (new file)
+- Tool: Claude Code (Sonnet 5)
+- Task: Milestone 4A: implement StatusDao against the Story table. postStatus stores the author's alias as the PK alongside the spread StatusDto fields; getPageOfStory queries by alias with ScanIndexForward:false (newest first), resuming via ExclusiveStartKey from the caller's lastTimestamp, and strips the alias field back off before returning StatusDto[].
+- Review: TODO
+
 ## 2026-11-21: tweeter-server/template.yaml
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A infra: add the Story DynamoDB table (PK alias/SK timestamp, storing the full denormalized StatusDto shape so Story reads need no join). Grants a DynamoDBCrudPolicy + STORY_TABLE_NAME env var to GetStoryFunction and PostStatusFunction. No DynamoStatusDao implementation yet.
