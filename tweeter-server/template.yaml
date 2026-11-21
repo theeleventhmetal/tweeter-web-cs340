@@ -81,9 +81,12 @@ Resources:
       Environment:
         Variables:
           USERS_TABLE_NAME: !Ref UsersTable
+          IMAGES_BUCKET_NAME: !Ref ProfileImagesBucket
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UsersTable
+        - S3CrudPolicy:
+            BucketName: !Ref ProfileImagesBucket
       Events:
         RegisterApi:
           Type: Api
@@ -241,6 +244,21 @@ Resources:
       KeySchema:
         - AttributeName: alias
           KeyType: HASH
+
+  # Public-read bucket for profile images. Ownership/public-access settings
+  # are declared here (rather than left as manual console steps) so ACL
+  # uploads and public GETs work as soon as this stack is deployed.
+  ProfileImagesBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
 
 Outputs:
   TweeterApiUrl:

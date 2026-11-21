@@ -2,6 +2,11 @@
 
 One entry per task where an AI agent wrote or modified files. See `AGENTS.md` for the format and process.
 
+## 2026-11-21: tweeter-server/template.yaml
+- Tool: Claude Code (Sonnet 5)
+- Task: Milestone 4A infra: add the ProfileImagesBucket S3 bucket, with OwnershipControls (BucketOwnerPreferred, so ACL uploads work) and PublicAccessBlockConfiguration fully opened declaratively, so the spec's console steps (block public access off, allow ACLs) happen automatically on deploy instead of by hand. Grants RegisterFunction an S3CrudPolicy on it plus an IMAGES_BUCKET_NAME env var. No S3ImageDao implementation yet.
+- Review: TODO
+
 ## 2026-11-21: tweeter-server/src/dao/dynamodb/DynamoUserDao.ts (new file)
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A: implement UserDao against the Users DynamoDB table using @aws-sdk/lib-dynamodb's DynamoDBDocumentClient (GetCommand/PutCommand). Table name read from the USERS_TABLE_NAME env var set in template.yaml, never hard-coded.
