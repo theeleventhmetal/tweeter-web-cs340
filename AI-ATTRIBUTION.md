@@ -2,6 +2,11 @@
 
 One entry per task where an AI agent wrote or modified files. See `AGENTS.md` for the format and process.
 
+## 2026-11-21: tweeter-server/src/dao/dynamodb/DynamoUserDao.ts (new file)
+- Tool: Claude Code (Sonnet 5)
+- Task: Milestone 4A: implement UserDao against the Users DynamoDB table using @aws-sdk/lib-dynamodb's DynamoDBDocumentClient (GetCommand/PutCommand). Table name read from the USERS_TABLE_NAME env var set in template.yaml, never hard-coded.
+- Review: TODO
+
 ## 2026-11-21: tweeter-server/template.yaml
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A infra: add the Users DynamoDB table (PK alias, PAY_PER_REQUEST billing so there's no idle provisioned capacity to remember to turn down) and grant RegisterFunction/LoginFunction/GetUserFunction a DynamoDBCrudPolicy on it plus a USERS_TABLE_NAME env var. No DynamoUserDao implementation yet - table exists but nothing reads/writes it.
