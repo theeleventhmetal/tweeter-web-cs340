@@ -2,6 +2,11 @@
 
 One entry per task where an AI agent wrote or modified files. See `AGENTS.md` for the format and process.
 
+## 2026-11-21: tweeter-server/src/dao/dynamodb/DynamoFollowDao.ts (new file)
+- Tool: Claude Code (Sonnet 5)
+- Task: Milestone 4A: implement FollowDao against the Follows table. follow/unfollow/isFollower are direct Put/Delete/Get by key; counts use Query with Select:COUNT; getPageOfFolloweeAliases queries the base table, getPageOfFollowerAliases queries the followee-index GSI, both using ExclusiveStartKey reconstructed from the caller's lastAlias; getAllFollowerAliases loops the GSI query to exhaustion (no page limit) for the feed fan-out step added later.
+- Review: TODO
+
 ## 2026-11-21: tweeter-server/template.yaml
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A infra: add the Follows DynamoDB table (PK followerAlias/SK followeeAlias, answers "who does X follow") with a followee-index GSI (swapped key order, answers "who follows X" without a scan). Grants a DynamoDBCrudPolicy + FOLLOWS_TABLE_NAME env var to the 7 follow-related Lambdas plus PostStatusFunction (needs read access for the feed fan-out step added later); GetFolloweesFunction/GetFollowersFunction also get Users table access since resolving an alias to a full User is a separate lookup. No DynamoFollowDao implementation yet.
