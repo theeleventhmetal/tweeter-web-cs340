@@ -248,6 +248,12 @@ Resources:
     Properties:
       CodeUri: dist-lambdas/GetFeedFunction
       Handler: index.handler
+      Environment:
+        Variables:
+          FEED_TABLE_NAME: !Ref FeedTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FeedTable
       Events:
         GetFeedApi:
           Type: Api
@@ -284,11 +290,14 @@ Resources:
         Variables:
           FOLLOWS_TABLE_NAME: !Ref FollowsTable
           STORY_TABLE_NAME: !Ref StoryTable
+          FEED_TABLE_NAME: !Ref FeedTable
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref FollowsTable
         - DynamoDBCrudPolicy:
             TableName: !Ref StoryTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FeedTable
       Events:
         PostStatusApi:
           Type: Api
@@ -360,6 +369,24 @@ Resources:
   # A user's own posted statuses (the Story tab). Items store the full
   # denormalized StatusDto shape so reads need no join back to Users.
   StoryTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: alias
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: N
+      KeySchema:
+        - AttributeName: alias
+          KeyType: HASH
+        - AttributeName: timestamp
+          KeyType: RANGE
+
+  # Each user's pre-computed feed (posts from people they follow). Same
+  # denormalized StatusDto shape as Story - populated by fan-out-on-write
+  # from postStatus, not assembled at read time, per the spec's requirement.
+  FeedTable:
     Type: AWS::DynamoDB::Table
     Properties:
       BillingMode: PAY_PER_REQUEST
