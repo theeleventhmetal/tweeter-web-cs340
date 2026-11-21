@@ -2,6 +2,11 @@
 
 One entry per task where an AI agent wrote or modified files. See `AGENTS.md` for the format and process.
 
+## 2026-11-21: tweeter-server/src/dao/DynamoDaoFactory.ts (new file)
+- Tool: Claude Code (Sonnet 5)
+- Task: Milestone 4A: implement the DaoFactory interface - DynamoDaoFactory, with one createXDao() method per DAO type returning the corresponding Dynamo*Dao/S3ImageDao. This is the concrete Abstract Factory Services will be constructed with; completes the DAO layer. Not wired into any Service yet.
+- Review: TODO
+
 ## 2026-11-21: tweeter-server/src/dao/dynamodb/DynamoFeedDao.ts (new file)
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A: implement FeedDao against the Feed table. addStatusToFeeds is the pre-compute/fan-out write - chunks the follower list into batches of 25 (DynamoDB's BatchWriteItem limit per the spec's notes) and BatchWriteCommands the denormalized status into each follower's feed partition. getPageOfFeed mirrors DynamoStatusDao's getPageOfStory (newest-first, ExclusiveStartKey resume). No retry logic for BatchWriteCommand's UnprocessedItems - acceptable at 4A's data scale, a 4B-style concern if it comes up.
