@@ -109,6 +109,12 @@ Resources:
     Properties:
       CodeUri: dist-lambdas/IsFollowerFunction
       Handler: index.handler
+      Environment:
+        Variables:
+          FOLLOWS_TABLE_NAME: !Ref FollowsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FollowsTable
       Events:
         IsFollowerApi:
           Type: Api
@@ -122,6 +128,12 @@ Resources:
     Properties:
       CodeUri: dist-lambdas/GetFolloweeCountFunction
       Handler: index.handler
+      Environment:
+        Variables:
+          FOLLOWS_TABLE_NAME: !Ref FollowsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FollowsTable
       Events:
         GetFolloweeCountApi:
           Type: Api
@@ -135,6 +147,12 @@ Resources:
     Properties:
       CodeUri: dist-lambdas/GetFollowerCountFunction
       Handler: index.handler
+      Environment:
+        Variables:
+          FOLLOWS_TABLE_NAME: !Ref FollowsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FollowsTable
       Events:
         GetFollowerCountApi:
           Type: Api
@@ -148,6 +166,12 @@ Resources:
     Properties:
       CodeUri: dist-lambdas/FollowFunction
       Handler: index.handler
+      Environment:
+        Variables:
+          FOLLOWS_TABLE_NAME: !Ref FollowsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FollowsTable
       Events:
         FollowApi:
           Type: Api
@@ -161,6 +185,12 @@ Resources:
     Properties:
       CodeUri: dist-lambdas/UnfollowFunction
       Handler: index.handler
+      Environment:
+        Variables:
+          FOLLOWS_TABLE_NAME: !Ref FollowsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FollowsTable
       Events:
         UnfollowApi:
           Type: Api
@@ -174,6 +204,15 @@ Resources:
     Properties:
       CodeUri: dist-lambdas/GetFolloweesFunction
       Handler: index.handler
+      Environment:
+        Variables:
+          FOLLOWS_TABLE_NAME: !Ref FollowsTable
+          USERS_TABLE_NAME: !Ref UsersTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FollowsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersTable
       Events:
         GetFolloweesApi:
           Type: Api
@@ -187,6 +226,15 @@ Resources:
     Properties:
       CodeUri: dist-lambdas/GetFollowersFunction
       Handler: index.handler
+      Environment:
+        Variables:
+          FOLLOWS_TABLE_NAME: !Ref FollowsTable
+          USERS_TABLE_NAME: !Ref UsersTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FollowsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UsersTable
       Events:
         GetFollowersApi:
           Type: Api
@@ -226,6 +274,12 @@ Resources:
     Properties:
       CodeUri: dist-lambdas/PostStatusFunction
       Handler: index.handler
+      Environment:
+        Variables:
+          FOLLOWS_TABLE_NAME: !Ref FollowsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FollowsTable
       Events:
         PostStatusApi:
           Type: Api
@@ -267,6 +321,32 @@ Resources:
       TimeToLiveSpecification:
         AttributeName: expiresAt
         Enabled: true
+
+  # PK followerAlias/SK followeeAlias answers "who does X follow"; the GSI
+  # swaps the key order to answer "who follows X" without a table scan.
+  FollowsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: followerAlias
+          AttributeType: S
+        - AttributeName: followeeAlias
+          AttributeType: S
+      KeySchema:
+        - AttributeName: followerAlias
+          KeyType: HASH
+        - AttributeName: followeeAlias
+          KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: followee-index
+          KeySchema:
+            - AttributeName: followeeAlias
+              KeyType: HASH
+            - AttributeName: followerAlias
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
 
   # Public-read bucket for profile images. Ownership/public-access settings
   # are declared here (rather than left as manual console steps) so ACL

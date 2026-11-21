@@ -2,6 +2,11 @@
 
 One entry per task where an AI agent wrote or modified files. See `AGENTS.md` for the format and process.
 
+## 2026-11-21: tweeter-server/template.yaml
+- Tool: Claude Code (Sonnet 5)
+- Task: Milestone 4A infra: add the Follows DynamoDB table (PK followerAlias/SK followeeAlias, answers "who does X follow") with a followee-index GSI (swapped key order, answers "who follows X" without a scan). Grants a DynamoDBCrudPolicy + FOLLOWS_TABLE_NAME env var to the 7 follow-related Lambdas plus PostStatusFunction (needs read access for the feed fan-out step added later); GetFolloweesFunction/GetFollowersFunction also get Users table access since resolving an alias to a full User is a separate lookup. No DynamoFollowDao implementation yet.
+- Review: TODO
+
 ## 2026-11-21: tweeter-server/src/service/AuthorizationService.ts (new file)
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A: add AuthorizationService per the spec's recommendation. validate(authToken) looks up the session via AuthTokenDao, throws a "[Unauthorized] ..." error if missing/expired (deleting expired sessions as it goes), otherwise returns the session's alias. Also owns createSession/endSession so UserService is the only other class that touches AuthTokenDao, routed through here. Sessions last 24h from creation - generous on purpose for a manually-graded course project passoff. Not wired into any Service yet.
