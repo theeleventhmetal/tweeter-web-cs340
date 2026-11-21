@@ -2,6 +2,11 @@
 
 One entry per task where an AI agent wrote or modified files. See `AGENTS.md` for the format and process.
 
+## 2026-11-21: tweeter-server/package.json, package-lock.json
+- Tool: Claude Code (Sonnet 5)
+- Task: Milestone 4A setup: add the npm dependencies the Data Access Layer needs (@aws-sdk/client-dynamodb, @aws-sdk/lib-dynamodb, @aws-sdk/client-s3, bcryptjs, @types/bcryptjs), confirmed with the user first since AGENTS.md says not to add dependencies without asking.
+- Review: TODO
+
 ## 2026-11-14: tweeter-shared/src/model/domain/User.ts, AuthToken.ts, Status.ts, Follow.ts, tweeter-shared/src/index.ts, tweeter-shared/src/model/net/request/TweeterRequest.ts (new file), tweeter-shared/src/model/net/response/TweeterResponse.ts (new file), tweeter-shared/src/model/net/request/PagedItemRequest.ts (new file), tweeter-shared/src/model/net/response/PagedItemResponse.ts (new file), tweeter-shared/src/model/net/request/AuthRequest.ts (new file), tweeter-shared/src/model/net/response/AuthResponse.ts (new file), tweeter-shared/src/model/net/request/RegisterRequest.ts (new file), tweeter-shared/src/model/net/request/GetUserRequest.ts (new file), tweeter-shared/src/model/net/response/GetUserResponse.ts (new file), tweeter-shared/src/model/net/request/UserCountRequest.ts (new file), tweeter-shared/src/model/net/response/CountResponse.ts (new file), tweeter-shared/src/model/net/request/IsFollowerRequest.ts (new file), tweeter-shared/src/model/net/response/IsFollowerResponse.ts (new file), tweeter-shared/src/model/net/request/FollowActionRequest.ts (new file), tweeter-shared/src/model/net/response/FollowActionResponse.ts (new file), tweeter-shared/src/model/net/request/PostStatusRequest.ts (new file)
 - Tool: Claude Code (Sonnet 5)
 - Task: Add toDto()/static fromDto() to the User, AuthToken, Status, and Follow domain classes, and add request/response interfaces (TweeterRequest/Response, PagedItemRequest/Response<T>, AuthRequest/Response, RegisterRequest, GetUserRequest/Response, UserCountRequest/CountResponse, IsFollowerRequest/Response, FollowActionRequest/Response, PostStatusRequest) covering all 14 Milestone 3 endpoints, exported from tweeter-shared/src/index.ts. Pure shared-module types; no server or client wiring yet.
