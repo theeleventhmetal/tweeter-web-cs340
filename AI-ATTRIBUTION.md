@@ -2,6 +2,11 @@
 
 One entry per task where an AI agent wrote or modified files. See `AGENTS.md` for the format and process.
 
+## 2026-11-21: tweeter-server/src/dao/interface/UserDao.ts (new file)
+- Tool: Claude Code (Sonnet 5)
+- Task: Milestone 4A DAO layer: define the database-agnostic UserDao interface (getUser/createUser) and a server-only UserEntity shape (includes passwordHash, unlike the client-facing UserDto) that it operates on. No implementation yet.
+- Review: TODO
+
 ## 2026-11-21: tweeter-server/package.json, package-lock.json
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A setup: add the npm dependencies the Data Access Layer needs (@aws-sdk/client-dynamodb, @aws-sdk/lib-dynamodb, @aws-sdk/client-s3, bcryptjs, @types/bcryptjs), confirmed with the user first since AGENTS.md says not to add dependencies without asking.
