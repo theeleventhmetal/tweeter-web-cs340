@@ -2,6 +2,11 @@
 
 One entry per task where an AI agent wrote or modified files. See `AGENTS.md` for the format and process.
 
+## 2026-11-21: tweeter-server/src/dao/s3/S3ImageDao.ts (new file)
+- Tool: Claude Code (Sonnet 5)
+- Task: Milestone 4A: implement ImageDao against S3, adapted from the spec's FAQ PutObjectCommand snippet - decodes the base64 image, writes it under image/<fileName> with public-read ACL, and returns the public URL. Extended the FAQ's hard-coded "image/png" ContentType to a small extension->MIME map (png/jpg/jpeg/gif) since RegisterPresenter captures the user's actual file extension. Bucket/region read from env vars, never hard-coded.
+- Review: TODO
+
 ## 2026-11-21: tweeter-server/template.yaml
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A infra: add the ProfileImagesBucket S3 bucket, with OwnershipControls (BucketOwnerPreferred, so ACL uploads work) and PublicAccessBlockConfiguration fully opened declaratively, so the spec's console steps (block public access off, allow ACLs) happen automatically on deploy instead of by hand. Grants RegisterFunction an S3CrudPolicy on it plus an IMAGES_BUCKET_NAME env var. No S3ImageDao implementation yet.
