@@ -2,6 +2,11 @@
 
 One entry per task where an AI agent wrote or modified files. See `AGENTS.md` for the format and process.
 
+## 2026-11-21: tweeter-server/src/service/AuthorizationService.ts (new file)
+- Tool: Claude Code (Sonnet 5)
+- Task: Milestone 4A: add AuthorizationService per the spec's recommendation. validate(authToken) looks up the session via AuthTokenDao, throws a "[Unauthorized] ..." error if missing/expired (deleting expired sessions as it goes), otherwise returns the session's alias. Also owns createSession/endSession so UserService is the only other class that touches AuthTokenDao, routed through here. Sessions last 24h from creation - generous on purpose for a manually-graded course project passoff. Not wired into any Service yet.
+- Review: TODO
+
 ## 2026-11-21: tweeter-server/src/dao/dynamodb/DynamoAuthTokenDao.ts (new file)
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A: implement AuthTokenDao against the Sessions table (createSession/getSession/deleteSession via PutCommand/GetCommand/DeleteCommand). Table name from the SESSIONS_TABLE_NAME env var. Used by AuthorizationService next.
