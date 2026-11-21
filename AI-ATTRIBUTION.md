@@ -2,6 +2,11 @@
 
 One entry per task where an AI agent wrote or modified files. See `AGENTS.md` for the format and process.
 
+## 2026-11-21: tweeter-server/src/dao/DaoFactory.ts (new file)
+- Tool: Claude Code (Sonnet 5)
+- Task: Milestone 4A: define the DaoFactory interface (Abstract Factory pattern) with one createXDao() method per DAO type. Services will take a DaoFactory via constructor injection and call these methods to get their DAOs, so they never call `new` on a concrete DAO class directly. No concrete factory implementation yet.
+- Review: TODO
+
 ## 2026-11-21: tweeter-server/src/dao/interface/ImageDao.ts (new file)
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A DAO layer: define the database-agnostic ImageDao interface (uploadImage, taking a filename and base64-encoded bytes, returning the public URL) used for S3 profile image uploads. Completes the set of 6 DAO interfaces. No implementation yet.
