@@ -1,10 +1,13 @@
 // AI-assisted: see AI-ATTRIBUTION.md
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { AuthToken, FollowActionRequest, FollowActionResponse, User } from "tweeter-shared";
+import { DynamoDaoFactory } from "../../dao/DynamoDaoFactory";
 import { FollowService } from "../../service/FollowService";
 import { CORS_HEADERS } from "../util/corsHeaders";
+import { statusCodeForError } from "../util/statusCodeForError";
 
-const followService = new FollowService();
+const daoFactory = new DynamoDaoFactory();
+const followService = new FollowService(daoFactory);
 
 export const handler = async (
   event: APIGatewayProxyEvent
@@ -15,7 +18,7 @@ export const handler = async (
     const targetUser = User.fromDto(request.targetUser);
 
     if (authToken == null || targetUser == null) {
-      throw new Error("Missing or invalid request fields");
+      throw new Error("[BadRequest] Missing or invalid request fields");
     }
 
     const [followerCount, followeeCount] = await followService.unfollow(
@@ -43,7 +46,7 @@ export const handler = async (
     };
 
     return {
-      statusCode: 400,
+      statusCode: statusCodeForError(error),
       headers: CORS_HEADERS,
       body: JSON.stringify(response),
     };
