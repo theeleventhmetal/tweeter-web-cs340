@@ -2,6 +2,11 @@
 
 One entry per task where an AI agent wrote or modified files. See `AGENTS.md` for the format and process.
 
+## 2026-11-22: tweeter-server/src/service/UserService.ts, tweeter-server/src/lambda/handler/RegisterLambda.ts, LoginLambda.ts, LogoutLambda.ts, GetUserLambda.ts, tweeter-server/src/dao/dynamodb/DynamoFollowDao.ts
+- Tool: Claude Code (Sonnet 5)
+- Task: Milestone 4A: rewrite UserService end-to-end against the DAO layer (register/login/logout/getUser), replacing FakeData. register checks alias uniqueness, uploads the profile image via ImageDao, hashes the password with bcryptjs (SALT_ROUNDS=10), writes the user via UserDao, and creates a session via AuthorizationService. login compares the submitted password against the stored hash with bcryptjs's compare, throwing the same "[Unauthorized]" message whether the alias doesn't exist or the password is wrong (doesn't reveal which). logout deletes the session. getUser validates the caller's session first, then looks up the requested alias. All 4 Lambdas now construct UserService with a DynamoDaoFactory and use statusCodeForError for their response status code; existing "missing auth token" throws re-prefixed "[BadRequest]" to match. Also fixed a pre-existing TS7022 type-inference error in DynamoFollowDao.getAllFollowerAliases (needed an explicit QueryCommandOutput annotation) that was blocking the build.
+- Review: TODO
+
 ## 2026-11-22: tweeter-server/src/lambda/util/statusCodeForError.ts (new file)
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A: add statusCodeForError, mapping a caught error's message prefix to an HTTP status: "[Unauthorized]" to 401, "[BadRequest]" to 400, anything else (DB/S3 failures, unexpected exceptions) to 500. Lambdas use proxy integration and already catch/format their own responses, so this replaces API Gateway's regex-based error mapping rather than relying on it. Not wired into any handler yet - existing handlers' unprefixed "missing field" errors get re-prefixed as each handler is touched next.

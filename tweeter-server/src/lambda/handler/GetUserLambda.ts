@@ -5,10 +5,13 @@ import {
   TweeterResponse,
   GetUserResponse,
 } from "tweeter-shared";
+import { DynamoDaoFactory } from "../../dao/DynamoDaoFactory";
 import { UserService } from "../../service/UserService";
 import { CORS_HEADERS } from "../util/corsHeaders";
+import { statusCodeForError } from "../util/statusCodeForError";
 
-const userService = new UserService();
+const daoFactory = new DynamoDaoFactory();
+const userService = new UserService(daoFactory);
 
 export const handler = async (
   event: APIGatewayProxyEvent,
@@ -18,7 +21,7 @@ export const handler = async (
     const authToken = AuthToken.fromDto(request.authToken);
 
     if (authToken == null) {
-      throw new Error("Missing or invalid auth token");
+      throw new Error("[BadRequest] Missing or invalid auth token");
     }
 
     const user = await userService.getUser(authToken, request.alias);
@@ -41,7 +44,7 @@ export const handler = async (
     };
 
     return {
-      statusCode: 400,
+      statusCode: statusCodeForError(error),
       headers: CORS_HEADERS,
       body: JSON.stringify(response),
     };

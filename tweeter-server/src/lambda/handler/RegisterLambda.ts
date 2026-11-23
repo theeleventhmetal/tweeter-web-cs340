@@ -1,10 +1,13 @@
 // AI-assisted: see AI-ATTRIBUTION.md
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { AuthResponse, RegisterRequest } from "tweeter-shared";
+import { DynamoDaoFactory } from "../../dao/DynamoDaoFactory";
 import { UserService } from "../../service/UserService";
 import { CORS_HEADERS } from "../util/corsHeaders";
+import { statusCodeForError } from "../util/statusCodeForError";
 
-const userService = new UserService();
+const daoFactory = new DynamoDaoFactory();
+const userService = new UserService(daoFactory);
 
 export const handler = async (
   event: APIGatewayProxyEvent
@@ -41,7 +44,7 @@ export const handler = async (
     };
 
     return {
-      statusCode: 400,
+      statusCode: statusCodeForError(error),
       headers: CORS_HEADERS,
       body: JSON.stringify(response),
     };

@@ -6,6 +6,7 @@ import {
   GetCommand,
   PutCommand,
   QueryCommand,
+  QueryCommandOutput,
 } from "@aws-sdk/lib-dynamodb";
 import { FollowDao } from "../interface/FollowDao";
 
@@ -136,7 +137,7 @@ export class DynamoFollowDao implements FollowDao {
     let exclusiveStartKey: Record<string, unknown> | undefined = undefined;
 
     do {
-      const result = await this.client.send(
+      const result: QueryCommandOutput = await this.client.send(
         new QueryCommand({
           TableName: TABLE_NAME,
           IndexName: FOLLOWEE_INDEX_NAME,
