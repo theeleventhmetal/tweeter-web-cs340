@@ -2,6 +2,11 @@
 
 One entry per task where an AI agent wrote or modified files. See `AGENTS.md` for the format and process.
 
+## 2026-11-22: tweeter-server/src/lambda/util/statusCodeForError.ts (new file)
+- Tool: Claude Code (Sonnet 5)
+- Task: Milestone 4A: add statusCodeForError, mapping a caught error's message prefix to an HTTP status: "[Unauthorized]" to 401, "[BadRequest]" to 400, anything else (DB/S3 failures, unexpected exceptions) to 500. Lambdas use proxy integration and already catch/format their own responses, so this replaces API Gateway's regex-based error mapping rather than relying on it. Not wired into any handler yet - existing handlers' unprefixed "missing field" errors get re-prefixed as each handler is touched next.
+- Review: TODO
+
 ## 2026-11-21: tweeter-server/src/dao/DynamoDaoFactory.ts (new file)
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A: implement the DaoFactory interface - DynamoDaoFactory, with one createXDao() method per DAO type returning the corresponding Dynamo*Dao/S3ImageDao. This is the concrete Abstract Factory Services will be constructed with; completes the DAO layer. Not wired into any Service yet.
