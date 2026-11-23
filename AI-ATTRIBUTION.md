@@ -2,6 +2,11 @@
 
 One entry per task where an AI agent wrote or modified files. See `AGENTS.md` for the format and process.
 
+## 2026-11-23: tweeter-server/src/service/StatusService.ts, tweeter-server/src/lambda/handler/PostStatusLambda.ts, GetStoryLambda.ts, GetFeedLambda.ts
+- Tool: Claude Code (Sonnet 5)
+- Task: Milestone 4A: rewrite StatusService end-to-end against the DAO layer, replacing FakeData - the last of the 3 Service classes. postStatus validates the session, writes the status to the author's Story partition via StatusDao, looks up all current followers via FollowDao.getAllFollowerAliases, and fans it out into each follower's Feed partition via FeedDao.addStatusToFeeds - the pre-computed feed the spec requires. loadMoreStoryItems/loadMoreFeedItems are straight paged reads off StatusDao/FeedDao respectively. All 3 Lambdas construct StatusService with a DynamoDaoFactory and use statusCodeForError, same pattern as the previous two rounds. Confirmed zero remaining FakeData references anywhere in tweeter-server/src.
+- Review: TODO
+
 ## 2026-11-22: tweeter-server/src/service/FollowService.ts, tweeter-server/src/lambda/handler/IsFollowerLambda.ts, GetFolloweeCountLambda.ts, GetFollowerCountLambda.ts, FollowLambda.ts, UnfollowLambda.ts, GetFolloweesLambda.ts, GetFollowersLambda.ts
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A: rewrite FollowService end-to-end against the DAO layer, replacing FakeData. Every method calls AuthorizationService.validate() first. getIsFollowerStatus/getFolloweeCount/getFollowerCount delegate straight to FollowDao. follow/unfollow write the relationship via FollowDao (follower alias comes from the validated session, not the request) and return the target user's recomputed counts. loadMoreFollowees/loadMoreFollowers page aliases via FollowDao then resolve each to a full User via UserDao (intentional N+1, per the spec's own Part A/B scope split - parallelized with Promise.all rather than serial awaits). All 7 Lambdas construct FollowService with a DynamoDaoFactory and use statusCodeForError, same mechanical pattern as the UserService round; existing "missing fields" throws re-prefixed "[BadRequest]".

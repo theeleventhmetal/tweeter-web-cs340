@@ -1,10 +1,13 @@
 // AI-assisted: see AI-ATTRIBUTION.md
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { AuthToken, PostStatusRequest, Status, TweeterResponse } from "tweeter-shared";
+import { DynamoDaoFactory } from "../../dao/DynamoDaoFactory";
 import { StatusService } from "../../service/StatusService";
 import { CORS_HEADERS } from "../util/corsHeaders";
+import { statusCodeForError } from "../util/statusCodeForError";
 
-const statusService = new StatusService();
+const daoFactory = new DynamoDaoFactory();
+const statusService = new StatusService(daoFactory);
 
 export const handler = async (
   event: APIGatewayProxyEvent
@@ -15,7 +18,7 @@ export const handler = async (
     const status = Status.fromDto(request.status);
 
     if (authToken == null || status == null) {
-      throw new Error("Missing or invalid request fields");
+      throw new Error("[BadRequest] Missing or invalid request fields");
     }
 
     await statusService.postStatus(authToken, status);
@@ -34,7 +37,7 @@ export const handler = async (
     };
 
     return {
-      statusCode: 400,
+      statusCode: statusCodeForError(error),
       headers: CORS_HEADERS,
       body: JSON.stringify(response),
     };

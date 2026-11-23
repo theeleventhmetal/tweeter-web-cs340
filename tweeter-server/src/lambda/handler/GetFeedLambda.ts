@@ -1,10 +1,13 @@
 // AI-assisted: see AI-ATTRIBUTION.md
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 import { AuthToken, PagedItemRequest, PagedItemResponse, Status, StatusDto } from "tweeter-shared";
+import { DynamoDaoFactory } from "../../dao/DynamoDaoFactory";
 import { StatusService } from "../../service/StatusService";
 import { CORS_HEADERS } from "../util/corsHeaders";
+import { statusCodeForError } from "../util/statusCodeForError";
 
-const statusService = new StatusService();
+const daoFactory = new DynamoDaoFactory();
+const statusService = new StatusService(daoFactory);
 
 export const handler = async (
   event: APIGatewayProxyEvent
@@ -15,7 +18,7 @@ export const handler = async (
     const lastItem = Status.fromDto(request.lastItem);
 
     if (authToken == null) {
-      throw new Error("Missing or invalid auth token");
+      throw new Error("[BadRequest] Missing or invalid auth token");
     }
 
     const [items, hasMore] = await statusService.loadMoreFeedItems(
@@ -45,7 +48,7 @@ export const handler = async (
     };
 
     return {
-      statusCode: 400,
+      statusCode: statusCodeForError(error),
       headers: CORS_HEADERS,
       body: JSON.stringify(response),
     };
