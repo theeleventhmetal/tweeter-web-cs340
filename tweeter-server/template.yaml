@@ -12,14 +12,14 @@ Globals:
     Timeout: 10
     MemorySize: 128
     # Every Lambda calls AuthorizationService.validate() on every
-    # authenticated request, so every Lambda needs Sessions table access -
-    # granted here once instead of repeated on all 14 functions below.
+    # authenticated request, so every Lambda needs the SESSIONS_TABLE_NAME
+    # env var - granted here once instead of repeated on all 14 functions
+    # below. SAM's Globals.Function does NOT support Policies (confirmed via
+    # sam validate), so each function's own Policies list below still needs
+    # its own DynamoDBCrudPolicy grant on SessionsTable.
     Environment:
       Variables:
         SESSIONS_TABLE_NAME: !Ref SessionsTable
-    Policies:
-      - DynamoDBCrudPolicy:
-          TableName: !Ref SessionsTable
 
 Resources:
   TweeterApi:
@@ -42,6 +42,8 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UsersTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SessionsTable
       Events:
         LoginApi:
           Type: Api
@@ -55,6 +57,9 @@ Resources:
     Properties:
       CodeUri: dist-lambdas/LogoutFunction
       Handler: index.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SessionsTable
       Events:
         LogoutApi:
           Type: Api
@@ -74,6 +79,8 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UsersTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SessionsTable
       Events:
         GetUserApi:
           Type: Api
@@ -96,6 +103,8 @@ Resources:
             TableName: !Ref UsersTable
         - S3CrudPolicy:
             BucketName: !Ref ProfileImagesBucket
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SessionsTable
       Events:
         RegisterApi:
           Type: Api
@@ -115,6 +124,8 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref FollowsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SessionsTable
       Events:
         IsFollowerApi:
           Type: Api
@@ -134,6 +145,8 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref FollowsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SessionsTable
       Events:
         GetFolloweeCountApi:
           Type: Api
@@ -153,6 +166,8 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref FollowsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SessionsTable
       Events:
         GetFollowerCountApi:
           Type: Api
@@ -172,6 +187,8 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref FollowsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SessionsTable
       Events:
         FollowApi:
           Type: Api
@@ -191,6 +208,8 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref FollowsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SessionsTable
       Events:
         UnfollowApi:
           Type: Api
@@ -213,6 +232,8 @@ Resources:
             TableName: !Ref FollowsTable
         - DynamoDBCrudPolicy:
             TableName: !Ref UsersTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SessionsTable
       Events:
         GetFolloweesApi:
           Type: Api
@@ -235,6 +256,8 @@ Resources:
             TableName: !Ref FollowsTable
         - DynamoDBCrudPolicy:
             TableName: !Ref UsersTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SessionsTable
       Events:
         GetFollowersApi:
           Type: Api
@@ -254,6 +277,8 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref FeedTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SessionsTable
       Events:
         GetFeedApi:
           Type: Api
@@ -273,6 +298,8 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref StoryTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SessionsTable
       Events:
         GetStoryApi:
           Type: Api
@@ -298,6 +325,8 @@ Resources:
             TableName: !Ref StoryTable
         - DynamoDBCrudPolicy:
             TableName: !Ref FeedTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SessionsTable
       Events:
         PostStatusApi:
           Type: Api

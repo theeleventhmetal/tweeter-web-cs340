@@ -2,6 +2,11 @@
 
 One entry per task where an AI agent wrote or modified files. See `AGENTS.md` for the format and process.
 
+## 2026-11-24: tweeter-server/template.yaml
+- Tool: Claude Code (Sonnet 5)
+- Task: Fix `sam build`/`sam validate` failure the user hit on first real deploy attempt: SAM's Globals.Function does not support a Policies property (InvalidGlobalsSectionException - confirmed by the actual error message, which lists the supported Globals.Function properties and Policies isn't one of them), even though Environment is supported there. Removed Globals.Function.Policies (kept Globals.Function.Environment.Variables.SESSIONS_TABLE_NAME, which is valid) and added an explicit DynamoDBCrudPolicy grant on SessionsTable to each of the 14 functions' own Policies list individually instead.
+- Review: TODO
+
 ## 2026-11-24: tweeter-web/test/network/ServerFacade.test.ts, tweeter-web/test/model.service/StatusService.test.ts
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A: rewrite the two live-API integration tests that previously asserted hard-coded FakeData values (per the user's decision to keep them as real integration tests rather than delete or leave them broken). ServerFacade.test.ts now registers its own uniquely timestamp-suffixed test user(s) per test and asserts round-trip behavior: register returns the same profile fields back, login works with the registered password and rejects the wrong one, and a full follow flow (register two users, confirm isFollower false, follow, confirm counts update to 1/0 and isFollower flips true, confirm getFollowers returns exactly that follower). StatusService.test.ts registers one user, posts a status, and reads it back via loadMoreStoryItems. No more FakeData-derived expectations anywhere in the test suite.
