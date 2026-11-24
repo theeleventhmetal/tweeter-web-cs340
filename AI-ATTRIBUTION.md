@@ -2,6 +2,11 @@
 
 One entry per task where an AI agent wrote or modified files. See `AGENTS.md` for the format and process.
 
+## 2026-11-24: tweeter-web/test/network/ServerFacade.test.ts, tweeter-web/test/model.service/StatusService.test.ts
+- Tool: Claude Code (Sonnet 5)
+- Task: Milestone 4A: rewrite the two live-API integration tests that previously asserted hard-coded FakeData values (per the user's decision to keep them as real integration tests rather than delete or leave them broken). ServerFacade.test.ts now registers its own uniquely timestamp-suffixed test user(s) per test and asserts round-trip behavior: register returns the same profile fields back, login works with the registered password and rejects the wrong one, and a full follow flow (register two users, confirm isFollower false, follow, confirm counts update to 1/0 and isFollower flips true, confirm getFollowers returns exactly that follower). StatusService.test.ts registers one user, posts a status, and reads it back via loadMoreStoryItems. No more FakeData-derived expectations anywhere in the test suite.
+- Review: TODO
+
 ## 2026-11-23: tweeter-server/src/service/StatusService.ts, tweeter-server/src/lambda/handler/PostStatusLambda.ts, GetStoryLambda.ts, GetFeedLambda.ts
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A: rewrite StatusService end-to-end against the DAO layer, replacing FakeData - the last of the 3 Service classes. postStatus validates the session, writes the status to the author's Story partition via StatusDao, looks up all current followers via FollowDao.getAllFollowerAliases, and fans it out into each follower's Feed partition via FeedDao.addStatusToFeeds - the pre-computed feed the spec requires. loadMoreStoryItems/loadMoreFeedItems are straight paged reads off StatusDao/FeedDao respectively. All 3 Lambdas construct StatusService with a DynamoDaoFactory and use statusCodeForError, same pattern as the previous two rounds. Confirmed zero remaining FakeData references anywhere in tweeter-server/src.

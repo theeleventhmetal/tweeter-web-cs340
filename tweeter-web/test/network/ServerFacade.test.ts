@@ -1,60 +1,136 @@
 // AI-assisted: see AI-ATTRIBUTION.md
 import "isomorphic-fetch";
-import { AuthToken, UserDto } from "tweeter-shared";
 import { ServerFacade } from "../../src/network/ServerFacade";
 
-// These are true integration tests: they call the live, deployed API.
-// Expected values come from the known, deterministic parts of FakeData
-// (see tweeter-shared/src/util/FakeData.ts) - the fixed user list order
-// and the fixed first user - not from whatever the code happens to
-// currently return.
+// True integration tests: they call the live, deployed API and a real
+// DynamoDB/S3 backend (Milestone 4A), so unlike the earlier FakeData-backed
+// version there's no fixed seed data to assert against. Each test registers
+// its own uniquely-aliased user(s) and asserts round-trip behavior instead.
 describe("ServerFacade integration tests", () => {
   const serverFacade = new ServerFacade();
-  const authToken = new AuthToken("test-token", Date.now()).toDto();
 
-  it("registers a user and gets back the first FakeData user (Allen Anderson)", async () => {
-    const [user, returnedAuthToken] = await serverFacade.register({
+  const uniqueAlias = (prefix: string): string =>
+    `@${prefix}${Date.now()}${Math.floor(Math.random() * 1000)}`;
+
+  it("registers a user and gets back the same profile fields", async () => {
+    const alias = uniqueAlias("reg");
+
+    const [user, authToken] = await serverFacade.register({
       firstName: "Test",
       lastName: "User",
-      alias: "@integrationtest",
+      alias,
       password: "password",
       userImageBytesBase64: "",
       imageFileExtension: "png",
     });
 
-    expect(user.firstName).toBe("Allen");
-    expect(user.lastName).toBe("Anderson");
-    expect(user.alias).toBe("@allen");
-    expect(returnedAuthToken.token.length).toBeGreaterThan(0);
+    expect(user.firstName).toBe("Test");
+    expect(user.lastName).toBe("User");
+    expect(user.alias).toBe(alias);
+    expect(authToken.token.length).toBeGreaterThan(0);
   });
 
-  it("gets a page of @allen's followers, omitting @allen from the result", async () => {
-    const [followers, hasMore] = await serverFacade.getFollowers({
+  it("logs in with the alias/password used at registration", async () => {
+    const alias = uniqueAlias("login");
+
+    await serverFacade.register({
+      firstName: "Login",
+      lastName: "Test",
+      alias,
+      password: "password123",
+      userImageBytesBase64: "",
+      imageFileExtension: "png",
+    });
+
+    const [user, authToken] = await serverFacade.login({
+      alias,
+      password: "password123",
+    });
+
+    expect(user.alias).toBe(alias);
+    expect(authToken.token.length).toBeGreaterThan(0);
+  });
+
+  it("rejects login with the wrong password", async () => {
+    const alias = uniqueAlias("badpw");
+
+    await serverFacade.register({
+      firstName: "Bad",
+      lastName: "Password",
+      alias,
+      password: "correct-password",
+      userImageBytesBase64: "",
+      imageFileExtension: "png",
+    });
+
+    await expect(
+      serverFacade.login({ alias, password: "wrong-password" })
+    ).rejects.toThrow();
+  });
+
+  it("follows a user and sees the updated counts and follower list", async () => {
+    const followerAlias = uniqueAlias("follower");
+    const followeeAlias = uniqueAlias("followee");
+
+    const [, followerToken] = await serverFacade.register({
+      firstName: "Follower",
+      lastName: "Person",
+      alias: followerAlias,
+      password: "password",
+      userImageBytesBase64: "",
+      imageFileExtension: "png",
+    });
+
+    const [followeeUser] = await serverFacade.register({
+      firstName: "Followee",
+      lastName: "Person",
+      alias: followeeAlias,
+      password: "password",
+      userImageBytesBase64: "",
+      imageFileExtension: "png",
+    });
+
+    const authToken = followerToken.toDto();
+    const followerUser = {
+      firstName: "Follower",
+      lastName: "Person",
+      alias: followerAlias,
+      imageUrl: "",
+    };
+
+    expect(
+      await serverFacade.getIsFollowerStatus({
+        authToken,
+        user: followerUser,
+        selectedUser: followeeUser,
+      })
+    ).toBe(false);
+
+    const [followerCount, followeeCount] = await serverFacade.follow({
       authToken,
-      userAlias: "@allen",
+      targetUser: followeeUser,
+    });
+
+    expect(followerCount).toBe(1);
+    expect(followeeCount).toBe(0);
+
+    expect(
+      await serverFacade.getIsFollowerStatus({
+        authToken,
+        user: followerUser,
+        selectedUser: followeeUser,
+      })
+    ).toBe(true);
+
+    const [followers, hasMoreFollowers] = await serverFacade.getFollowers({
+      authToken,
+      userAlias: followeeAlias,
       pageSize: 10,
       lastItem: null,
     });
 
-    expect(followers.length).toBe(10);
-    expect(followers[0].alias).toBe("@amy");
-    expect(followers[9].alias).toBe("@frank");
-    expect(hasMore).toBe(true);
-  });
-
-  it("gets a follower count greater than zero for @allen", async () => {
-    const allen: UserDto = {
-      firstName: "Allen",
-      lastName: "Anderson",
-      alias: "@allen",
-      imageUrl: "",
-    };
-
-    const count = await serverFacade.getFollowerCount({
-      authToken,
-      user: allen,
-    });
-
-    expect(count).toBeGreaterThan(0);
+    expect(followers.length).toBe(1);
+    expect(followers[0].alias).toBe(followerAlias);
+    expect(hasMoreFollowers).toBe(false);
   });
 });
