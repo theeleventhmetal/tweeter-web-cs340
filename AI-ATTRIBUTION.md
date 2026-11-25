@@ -5,147 +5,147 @@ One entry per task where an AI agent wrote or modified files. See `AGENTS.md` fo
 ## 2026-11-24: tweeter-web/test/network/ServerFacade.test.ts
 - Tool: Claude Code (Sonnet 5)
 - Task: Fix two bugs the user hit running the rewritten integration tests for real. (1) "follows a user..." passed followeeUser (a User class instance returned by register()) directly as selectedUser/targetUser where a plain UserDto is required; JSON.stringify serializes a class instance's private fields (_firstName, _alias, etc.) rather than the getter names, so the server reconstructed a User with alias: undefined, and DynamoDB's GetCommand rejected the resulting Key with "provided key element does not match the schema" - fixed by calling .toDto() on followeeUser before using it in any request. (2) That same test then hit Jest's default 5s timeout since it makes 6 sequential live-API round trips including several cold Lambda starts - bumped its own timeout to 20s rather than the whole suite's.
-- Review: TODO
+- Review: Confirmed working - ran `sam build`/`sam deploy` myself, tested the live app end-to-end (registered profiles, posted 10+ statuses, followed/unfollowed successfully), and ran the automated integration test suite (21/21 passing).
 
 ## 2026-11-24: tweeter-server/template.yaml
 - Tool: Claude Code (Sonnet 5)
 - Task: Fix `sam build`/`sam validate` failure the user hit on first real deploy attempt: SAM's Globals.Function does not support a Policies property (InvalidGlobalsSectionException - confirmed by the actual error message, which lists the supported Globals.Function properties and Policies isn't one of them), even though Environment is supported there. Removed Globals.Function.Policies (kept Globals.Function.Environment.Variables.SESSIONS_TABLE_NAME, which is valid) and added an explicit DynamoDBCrudPolicy grant on SessionsTable to each of the 14 functions' own Policies list individually instead.
-- Review: TODO
+- Review: Confirmed working - ran `sam build`/`sam deploy` myself, tested the live app end-to-end (registered profiles, posted 10+ statuses, followed/unfollowed successfully), and ran the automated integration test suite (21/21 passing).
 
 ## 2026-11-24: tweeter-web/test/network/ServerFacade.test.ts, tweeter-web/test/model.service/StatusService.test.ts
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A: rewrite the two live-API integration tests that previously asserted hard-coded FakeData values (per the user's decision to keep them as real integration tests rather than delete or leave them broken). ServerFacade.test.ts now registers its own uniquely timestamp-suffixed test user(s) per test and asserts round-trip behavior: register returns the same profile fields back, login works with the registered password and rejects the wrong one, and a full follow flow (register two users, confirm isFollower false, follow, confirm counts update to 1/0 and isFollower flips true, confirm getFollowers returns exactly that follower). StatusService.test.ts registers one user, posts a status, and reads it back via loadMoreStoryItems. No more FakeData-derived expectations anywhere in the test suite.
-- Review: TODO
+- Review: Confirmed working - ran `sam build`/`sam deploy` myself, tested the live app end-to-end (registered profiles, posted 10+ statuses, followed/unfollowed successfully), and ran the automated integration test suite (21/21 passing).
 
 ## 2026-11-23: tweeter-server/src/service/StatusService.ts, tweeter-server/src/lambda/handler/PostStatusLambda.ts, GetStoryLambda.ts, GetFeedLambda.ts
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A: rewrite StatusService end-to-end against the DAO layer, replacing FakeData - the last of the 3 Service classes. postStatus validates the session, writes the status to the author's Story partition via StatusDao, looks up all current followers via FollowDao.getAllFollowerAliases, and fans it out into each follower's Feed partition via FeedDao.addStatusToFeeds - the pre-computed feed the spec requires. loadMoreStoryItems/loadMoreFeedItems are straight paged reads off StatusDao/FeedDao respectively. All 3 Lambdas construct StatusService with a DynamoDaoFactory and use statusCodeForError, same pattern as the previous two rounds. Confirmed zero remaining FakeData references anywhere in tweeter-server/src.
-- Review: TODO
+- Review: Confirmed working - ran `sam build`/`sam deploy` myself, tested the live app end-to-end (registered profiles, posted 10+ statuses, followed/unfollowed successfully), and ran the automated integration test suite (21/21 passing).
 
 ## 2026-11-22: tweeter-server/src/service/FollowService.ts, tweeter-server/src/lambda/handler/IsFollowerLambda.ts, GetFolloweeCountLambda.ts, GetFollowerCountLambda.ts, FollowLambda.ts, UnfollowLambda.ts, GetFolloweesLambda.ts, GetFollowersLambda.ts
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A: rewrite FollowService end-to-end against the DAO layer, replacing FakeData. Every method calls AuthorizationService.validate() first. getIsFollowerStatus/getFolloweeCount/getFollowerCount delegate straight to FollowDao. follow/unfollow write the relationship via FollowDao (follower alias comes from the validated session, not the request) and return the target user's recomputed counts. loadMoreFollowees/loadMoreFollowers page aliases via FollowDao then resolve each to a full User via UserDao (intentional N+1, per the spec's own Part A/B scope split - parallelized with Promise.all rather than serial awaits). All 7 Lambdas construct FollowService with a DynamoDaoFactory and use statusCodeForError, same mechanical pattern as the UserService round; existing "missing fields" throws re-prefixed "[BadRequest]".
-- Review: TODO
+- Review: Confirmed working - ran `sam build`/`sam deploy` myself, tested the live app end-to-end (registered profiles, posted 10+ statuses, followed/unfollowed successfully), and ran the automated integration test suite (21/21 passing).
 
 ## 2026-11-22: tweeter-server/src/service/UserService.ts, tweeter-server/src/lambda/handler/RegisterLambda.ts, LoginLambda.ts, LogoutLambda.ts, GetUserLambda.ts, tweeter-server/src/dao/dynamodb/DynamoFollowDao.ts
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A: rewrite UserService end-to-end against the DAO layer (register/login/logout/getUser), replacing FakeData. register checks alias uniqueness, uploads the profile image via ImageDao, hashes the password with bcryptjs (SALT_ROUNDS=10), writes the user via UserDao, and creates a session via AuthorizationService. login compares the submitted password against the stored hash with bcryptjs's compare, throwing the same "[Unauthorized]" message whether the alias doesn't exist or the password is wrong (doesn't reveal which). logout deletes the session. getUser validates the caller's session first, then looks up the requested alias. All 4 Lambdas now construct UserService with a DynamoDaoFactory and use statusCodeForError for their response status code; existing "missing auth token" throws re-prefixed "[BadRequest]" to match. Also fixed a pre-existing TS7022 type-inference error in DynamoFollowDao.getAllFollowerAliases (needed an explicit QueryCommandOutput annotation) that was blocking the build.
-- Review: TODO
+- Review: Confirmed working - ran `sam build`/`sam deploy` myself, tested the live app end-to-end (registered profiles, posted 10+ statuses, followed/unfollowed successfully), and ran the automated integration test suite (21/21 passing).
 
 ## 2026-11-22: tweeter-server/src/lambda/util/statusCodeForError.ts (new file)
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A: add statusCodeForError, mapping a caught error's message prefix to an HTTP status: "[Unauthorized]" to 401, "[BadRequest]" to 400, anything else (DB/S3 failures, unexpected exceptions) to 500. Lambdas use proxy integration and already catch/format their own responses, so this replaces API Gateway's regex-based error mapping rather than relying on it. Not wired into any handler yet - existing handlers' unprefixed "missing field" errors get re-prefixed as each handler is touched next.
-- Review: TODO
+- Review: Confirmed working - ran `sam build`/`sam deploy` myself, tested the live app end-to-end (registered profiles, posted 10+ statuses, followed/unfollowed successfully), and ran the automated integration test suite (21/21 passing).
 
 ## 2026-11-21: tweeter-server/src/dao/DynamoDaoFactory.ts (new file)
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A: implement the DaoFactory interface - DynamoDaoFactory, with one createXDao() method per DAO type returning the corresponding Dynamo*Dao/S3ImageDao. This is the concrete Abstract Factory Services will be constructed with; completes the DAO layer. Not wired into any Service yet.
-- Review: TODO
+- Review: Confirmed working - ran `sam build`/`sam deploy` myself, tested the live app end-to-end (registered profiles, posted 10+ statuses, followed/unfollowed successfully), and ran the automated integration test suite (21/21 passing).
 
 ## 2026-11-21: tweeter-server/src/dao/dynamodb/DynamoFeedDao.ts (new file)
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A: implement FeedDao against the Feed table. addStatusToFeeds is the pre-compute/fan-out write - chunks the follower list into batches of 25 (DynamoDB's BatchWriteItem limit per the spec's notes) and BatchWriteCommands the denormalized status into each follower's feed partition. getPageOfFeed mirrors DynamoStatusDao's getPageOfStory (newest-first, ExclusiveStartKey resume). No retry logic for BatchWriteCommand's UnprocessedItems - acceptable at 4A's data scale, a 4B-style concern if it comes up.
-- Review: TODO
+- Review: Confirmed working - ran `sam build`/`sam deploy` myself, tested the live app end-to-end (registered profiles, posted 10+ statuses, followed/unfollowed successfully), and ran the automated integration test suite (21/21 passing).
 
 ## 2026-11-21: tweeter-server/template.yaml
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A infra: add the Feed DynamoDB table (same PK alias/SK timestamp shape as Story, but keyed by viewer rather than author) - the pre-computed feed the spec requires, populated by fan-out-on-write from postStatus rather than assembled at read time. Grants a DynamoDBCrudPolicy + FEED_TABLE_NAME env var to GetFeedFunction and PostStatusFunction. No DynamoFeedDao implementation yet.
-- Review: TODO
+- Review: Confirmed working - ran `sam build`/`sam deploy` myself, tested the live app end-to-end (registered profiles, posted 10+ statuses, followed/unfollowed successfully), and ran the automated integration test suite (21/21 passing).
 
 ## 2026-11-21: tweeter-server/src/dao/dynamodb/DynamoStatusDao.ts (new file)
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A: implement StatusDao against the Story table. postStatus stores the author's alias as the PK alongside the spread StatusDto fields; getPageOfStory queries by alias with ScanIndexForward:false (newest first), resuming via ExclusiveStartKey from the caller's lastTimestamp, and strips the alias field back off before returning StatusDto[].
-- Review: TODO
+- Review: Confirmed working - ran `sam build`/`sam deploy` myself, tested the live app end-to-end (registered profiles, posted 10+ statuses, followed/unfollowed successfully), and ran the automated integration test suite (21/21 passing).
 
 ## 2026-11-21: tweeter-server/template.yaml
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A infra: add the Story DynamoDB table (PK alias/SK timestamp, storing the full denormalized StatusDto shape so Story reads need no join). Grants a DynamoDBCrudPolicy + STORY_TABLE_NAME env var to GetStoryFunction and PostStatusFunction. No DynamoStatusDao implementation yet.
-- Review: TODO
+- Review: Confirmed working - ran `sam build`/`sam deploy` myself, tested the live app end-to-end (registered profiles, posted 10+ statuses, followed/unfollowed successfully), and ran the automated integration test suite (21/21 passing).
 
 ## 2026-11-21: tweeter-server/src/dao/dynamodb/DynamoFollowDao.ts (new file)
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A: implement FollowDao against the Follows table. follow/unfollow/isFollower are direct Put/Delete/Get by key; counts use Query with Select:COUNT; getPageOfFolloweeAliases queries the base table, getPageOfFollowerAliases queries the followee-index GSI, both using ExclusiveStartKey reconstructed from the caller's lastAlias; getAllFollowerAliases loops the GSI query to exhaustion (no page limit) for the feed fan-out step added later.
-- Review: TODO
+- Review: Confirmed working - ran `sam build`/`sam deploy` myself, tested the live app end-to-end (registered profiles, posted 10+ statuses, followed/unfollowed successfully), and ran the automated integration test suite (21/21 passing).
 
 ## 2026-11-21: tweeter-server/template.yaml
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A infra: add the Follows DynamoDB table (PK followerAlias/SK followeeAlias, answers "who does X follow") with a followee-index GSI (swapped key order, answers "who follows X" without a scan). Grants a DynamoDBCrudPolicy + FOLLOWS_TABLE_NAME env var to the 7 follow-related Lambdas plus PostStatusFunction (needs read access for the feed fan-out step added later); GetFolloweesFunction/GetFollowersFunction also get Users table access since resolving an alias to a full User is a separate lookup. No DynamoFollowDao implementation yet.
-- Review: TODO
+- Review: Confirmed working - ran `sam build`/`sam deploy` myself, tested the live app end-to-end (registered profiles, posted 10+ statuses, followed/unfollowed successfully), and ran the automated integration test suite (21/21 passing).
 
 ## 2026-11-21: tweeter-server/src/service/AuthorizationService.ts (new file)
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A: add AuthorizationService per the spec's recommendation. validate(authToken) looks up the session via AuthTokenDao, throws a "[Unauthorized] ..." error if missing/expired (deleting expired sessions as it goes), otherwise returns the session's alias. Also owns createSession/endSession so UserService is the only other class that touches AuthTokenDao, routed through here. Sessions last 24h from creation - generous on purpose for a manually-graded course project passoff. Not wired into any Service yet.
-- Review: TODO
+- Review: Confirmed working - ran `sam build`/`sam deploy` myself, tested the live app end-to-end (registered profiles, posted 10+ statuses, followed/unfollowed successfully), and ran the automated integration test suite (21/21 passing).
 
 ## 2026-11-21: tweeter-server/src/dao/dynamodb/DynamoAuthTokenDao.ts (new file)
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A: implement AuthTokenDao against the Sessions table (createSession/getSession/deleteSession via PutCommand/GetCommand/DeleteCommand). Table name from the SESSIONS_TABLE_NAME env var. Used by AuthorizationService next.
-- Review: TODO
+- Review: Confirmed working - ran `sam build`/`sam deploy` myself, tested the live app end-to-end (registered profiles, posted 10+ statuses, followed/unfollowed successfully), and ran the automated integration test suite (21/21 passing).
 
 ## 2026-11-21: tweeter-server/template.yaml
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A infra: add the Sessions DynamoDB table (PK token, TTL on expiresAt for auto-cleanup once a session has expired). Granted on Globals.Function instead of per-function, since every one of the 14 Lambdas calls AuthorizationService.validate() and therefore needs Sessions table read/write - a DynamoDBCrudPolicy plus SESSIONS_TABLE_NAME env var there apply to all functions at once. No DynamoAuthTokenDao/AuthorizationService implementation yet.
-- Review: TODO
+- Review: Confirmed working - ran `sam build`/`sam deploy` myself, tested the live app end-to-end (registered profiles, posted 10+ statuses, followed/unfollowed successfully), and ran the automated integration test suite (21/21 passing).
 
 ## 2026-11-21: tweeter-server/src/dao/s3/S3ImageDao.ts (new file)
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A: implement ImageDao against S3, adapted from the spec's FAQ PutObjectCommand snippet - decodes the base64 image, writes it under image/<fileName> with public-read ACL, and returns the public URL. Extended the FAQ's hard-coded "image/png" ContentType to a small extension->MIME map (png/jpg/jpeg/gif) since RegisterPresenter captures the user's actual file extension. Bucket/region read from env vars, never hard-coded.
-- Review: TODO
+- Review: Confirmed working - ran `sam build`/`sam deploy` myself, tested the live app end-to-end (registered profiles, posted 10+ statuses, followed/unfollowed successfully), and ran the automated integration test suite (21/21 passing).
 
 ## 2026-11-21: tweeter-server/template.yaml
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A infra: add the ProfileImagesBucket S3 bucket, with OwnershipControls (BucketOwnerPreferred, so ACL uploads work) and PublicAccessBlockConfiguration fully opened declaratively, so the spec's console steps (block public access off, allow ACLs) happen automatically on deploy instead of by hand. Grants RegisterFunction an S3CrudPolicy on it plus an IMAGES_BUCKET_NAME env var. No S3ImageDao implementation yet.
-- Review: TODO
+- Review: Confirmed working - ran `sam build`/`sam deploy` myself, tested the live app end-to-end (registered profiles, posted 10+ statuses, followed/unfollowed successfully), and ran the automated integration test suite (21/21 passing).
 
 ## 2026-11-21: tweeter-server/src/dao/dynamodb/DynamoUserDao.ts (new file)
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A: implement UserDao against the Users DynamoDB table using @aws-sdk/lib-dynamodb's DynamoDBDocumentClient (GetCommand/PutCommand). Table name read from the USERS_TABLE_NAME env var set in template.yaml, never hard-coded.
-- Review: TODO
+- Review: Confirmed working - ran `sam build`/`sam deploy` myself, tested the live app end-to-end (registered profiles, posted 10+ statuses, followed/unfollowed successfully), and ran the automated integration test suite (21/21 passing).
 
 ## 2026-11-21: tweeter-server/template.yaml
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A infra: add the Users DynamoDB table (PK alias, PAY_PER_REQUEST billing so there's no idle provisioned capacity to remember to turn down) and grant RegisterFunction/LoginFunction/GetUserFunction a DynamoDBCrudPolicy on it plus a USERS_TABLE_NAME env var. No DynamoUserDao implementation yet - table exists but nothing reads/writes it.
-- Review: TODO
+- Review: Confirmed working - ran `sam build`/`sam deploy` myself, tested the live app end-to-end (registered profiles, posted 10+ statuses, followed/unfollowed successfully), and ran the automated integration test suite (21/21 passing).
 
 ## 2026-11-21: tweeter-server/src/dao/DaoFactory.ts (new file)
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A: define the DaoFactory interface (Abstract Factory pattern) with one createXDao() method per DAO type. Services will take a DaoFactory via constructor injection and call these methods to get their DAOs, so they never call `new` on a concrete DAO class directly. No concrete factory implementation yet.
-- Review: TODO
+- Review: Confirmed working - ran `sam build`/`sam deploy` myself, tested the live app end-to-end (registered profiles, posted 10+ statuses, followed/unfollowed successfully), and ran the automated integration test suite (21/21 passing).
 
 ## 2026-11-21: tweeter-server/src/dao/interface/ImageDao.ts (new file)
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A DAO layer: define the database-agnostic ImageDao interface (uploadImage, taking a filename and base64-encoded bytes, returning the public URL) used for S3 profile image uploads. Completes the set of 6 DAO interfaces. No implementation yet.
-- Review: TODO
+- Review: Confirmed working - ran `sam build`/`sam deploy` myself, tested the live app end-to-end (registered profiles, posted 10+ statuses, followed/unfollowed successfully), and ran the automated integration test suite (21/21 passing).
 
 ## 2026-11-21: tweeter-server/src/dao/interface/FeedDao.ts (new file)
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A DAO layer: define the database-agnostic FeedDao interface for each user's pre-computed feed - addStatusToFeeds (batch fan-out write to a list of followers, called from postStatus) and a paged getPageOfFeed. Per the spec's requirement that feed contents be pre-computed rather than calculated at read time. No implementation yet.
-- Review: TODO
+- Review: Confirmed working - ran `sam build`/`sam deploy` myself, tested the live app end-to-end (registered profiles, posted 10+ statuses, followed/unfollowed successfully), and ran the automated integration test suite (21/21 passing).
 
 ## 2026-11-21: tweeter-server/src/dao/interface/StatusDao.ts (new file)
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A DAO layer: define the database-agnostic StatusDao interface for a user's own posted statuses (the Story tab) - postStatus and a paged getPageOfStory. Stores the full StatusDto shape (post, user, timestamp) denormalized so story reads need no join. No implementation yet.
-- Review: TODO
+- Review: Confirmed working - ran `sam build`/`sam deploy` myself, tested the live app end-to-end (registered profiles, posted 10+ statuses, followed/unfollowed successfully), and ran the automated integration test suite (21/21 passing).
 
 ## 2026-11-21: tweeter-server/src/dao/interface/FollowDao.ts (new file)
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A DAO layer: define the database-agnostic FollowDao interface covering follow/unfollow, isFollower, follower/followee counts, paged alias lookups in both directions, and getAllFollowerAliases (used by the feed fan-out-on-write path added later). Works in plain aliases, not UserDto - callers resolve full user info via UserDao. No implementation yet.
-- Review: TODO
+- Review: Confirmed working - ran `sam build`/`sam deploy` myself, tested the live app end-to-end (registered profiles, posted 10+ statuses, followed/unfollowed successfully), and ran the automated integration test suite (21/21 passing).
 
 ## 2026-11-21: tweeter-server/src/dao/interface/AuthTokenDao.ts (new file)
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A DAO layer: define the database-agnostic AuthTokenDao interface (createSession/getSession/deleteSession) and the SessionEntity shape (token, alias, epoch-seconds expiresAt) it operates on. Backs server-side session management. No implementation yet.
-- Review: TODO
+- Review: Confirmed working - ran `sam build`/`sam deploy` myself, tested the live app end-to-end (registered profiles, posted 10+ statuses, followed/unfollowed successfully), and ran the automated integration test suite (21/21 passing).
 
 ## 2026-11-21: tweeter-server/src/dao/interface/UserDao.ts (new file)
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A DAO layer: define the database-agnostic UserDao interface (getUser/createUser) and a server-only UserEntity shape (includes passwordHash, unlike the client-facing UserDto) that it operates on. No implementation yet.
-- Review: TODO
+- Review: Confirmed working - ran `sam build`/`sam deploy` myself, tested the live app end-to-end (registered profiles, posted 10+ statuses, followed/unfollowed successfully), and ran the automated integration test suite (21/21 passing).
 
 ## 2026-11-21: tweeter-server/package.json, package-lock.json
 - Tool: Claude Code (Sonnet 5)
 - Task: Milestone 4A setup: add the npm dependencies the Data Access Layer needs (@aws-sdk/client-dynamodb, @aws-sdk/lib-dynamodb, @aws-sdk/client-s3, bcryptjs, @types/bcryptjs), confirmed with the user first since AGENTS.md says not to add dependencies without asking.
-- Review: TODO
+- Review: Confirmed working - ran `sam build`/`sam deploy` myself, tested the live app end-to-end (registered profiles, posted 10+ statuses, followed/unfollowed successfully), and ran the automated integration test suite (21/21 passing).
 
 ## 2026-11-14: tweeter-shared/src/model/domain/User.ts, AuthToken.ts, Status.ts, Follow.ts, tweeter-shared/src/index.ts, tweeter-shared/src/model/net/request/TweeterRequest.ts (new file), tweeter-shared/src/model/net/response/TweeterResponse.ts (new file), tweeter-shared/src/model/net/request/PagedItemRequest.ts (new file), tweeter-shared/src/model/net/response/PagedItemResponse.ts (new file), tweeter-shared/src/model/net/request/AuthRequest.ts (new file), tweeter-shared/src/model/net/response/AuthResponse.ts (new file), tweeter-shared/src/model/net/request/RegisterRequest.ts (new file), tweeter-shared/src/model/net/request/GetUserRequest.ts (new file), tweeter-shared/src/model/net/response/GetUserResponse.ts (new file), tweeter-shared/src/model/net/request/UserCountRequest.ts (new file), tweeter-shared/src/model/net/response/CountResponse.ts (new file), tweeter-shared/src/model/net/request/IsFollowerRequest.ts (new file), tweeter-shared/src/model/net/response/IsFollowerResponse.ts (new file), tweeter-shared/src/model/net/request/FollowActionRequest.ts (new file), tweeter-shared/src/model/net/response/FollowActionResponse.ts (new file), tweeter-shared/src/model/net/request/PostStatusRequest.ts (new file)
 - Tool: Claude Code (Sonnet 5)
