@@ -2,6 +2,11 @@
 
 One entry per task where an AI agent wrote or modified files. See `AGENTS.md` for the format and process.
 
+## 2026-11-24: tweeter-web/test/network/ServerFacade.test.ts
+- Tool: Claude Code (Sonnet 5)
+- Task: Fix two bugs the user hit running the rewritten integration tests for real. (1) "follows a user..." passed followeeUser (a User class instance returned by register()) directly as selectedUser/targetUser where a plain UserDto is required; JSON.stringify serializes a class instance's private fields (_firstName, _alias, etc.) rather than the getter names, so the server reconstructed a User with alias: undefined, and DynamoDB's GetCommand rejected the resulting Key with "provided key element does not match the schema" - fixed by calling .toDto() on followeeUser before using it in any request. (2) That same test then hit Jest's default 5s timeout since it makes 6 sequential live-API round trips including several cold Lambda starts - bumped its own timeout to 20s rather than the whole suite's.
+- Review: TODO
+
 ## 2026-11-24: tweeter-server/template.yaml
 - Tool: Claude Code (Sonnet 5)
 - Task: Fix `sam build`/`sam validate` failure the user hit on first real deploy attempt: SAM's Globals.Function does not support a Policies property (InvalidGlobalsSectionException - confirmed by the actual error message, which lists the supported Globals.Function properties and Policies isn't one of them), even though Environment is supported there. Removed Globals.Function.Policies (kept Globals.Function.Environment.Variables.SESSIONS_TABLE_NAME, which is valid) and added an explicit DynamoDBCrudPolicy grant on SessionsTable to each of the 14 functions' own Policies list individually instead.

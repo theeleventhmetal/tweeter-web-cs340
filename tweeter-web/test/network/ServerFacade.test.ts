@@ -69,6 +69,9 @@ describe("ServerFacade integration tests", () => {
   });
 
   it("follows a user and sees the updated counts and follower list", async () => {
+    // More round trips than the other tests here (2 registers, 2
+    // isFollower checks, follow, getFollowers), some hitting cold Lambda
+    // starts - the 5s Jest default is too tight for this one.
     const followerAlias = uniqueAlias("follower");
     const followeeAlias = uniqueAlias("followee");
 
@@ -89,6 +92,7 @@ describe("ServerFacade integration tests", () => {
       userImageBytesBase64: "",
       imageFileExtension: "png",
     });
+    const followeeUserDto = followeeUser.toDto();
 
     const authToken = followerToken.toDto();
     const followerUser = {
@@ -102,13 +106,13 @@ describe("ServerFacade integration tests", () => {
       await serverFacade.getIsFollowerStatus({
         authToken,
         user: followerUser,
-        selectedUser: followeeUser,
+        selectedUser: followeeUserDto,
       })
     ).toBe(false);
 
     const [followerCount, followeeCount] = await serverFacade.follow({
       authToken,
-      targetUser: followeeUser,
+      targetUser: followeeUserDto,
     });
 
     expect(followerCount).toBe(1);
@@ -118,7 +122,7 @@ describe("ServerFacade integration tests", () => {
       await serverFacade.getIsFollowerStatus({
         authToken,
         user: followerUser,
-        selectedUser: followeeUser,
+        selectedUser: followeeUserDto,
       })
     ).toBe(true);
 
@@ -132,5 +136,5 @@ describe("ServerFacade integration tests", () => {
     expect(followers.length).toBe(1);
     expect(followers[0].alias).toBe(followerAlias);
     expect(hasMoreFollowers).toBe(false);
-  });
+  }, 20000);
 });
